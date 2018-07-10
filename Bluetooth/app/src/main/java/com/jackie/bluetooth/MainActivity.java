@@ -59,13 +59,14 @@ import static android.R.layout.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnconect, btn1, btn2, btn3,save;
+    Button btnconect, btn1, btn2, btn3;
     //ListView mensagem;
-    //TextView logDados;
-    EditText et__name;
-    private static EditText logDados;
+    TextView mostrarDados;
+    //EditText et__name;
+    //private static EditText logDados;
     Handler h;
     //static TextView statusMessage;
+    final int RECEIVE_MESSAGE = 1;
 
     private static final int SOLICITA_BT_ACT = 1;
     private static final int SOLICITA_BT_CON = 2;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         currentTime = Calendar.getInstance().getTime();
     }
 
+
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,35 +101,26 @@ public class MainActivity extends AppCompatActivity {
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         btn3 = (Button) findViewById(R.id.btn3);
-        logDados = (EditText) findViewById(R.id.logDados);
-        et__name = (EditText) findViewById(R.id.et_name);
+        mostrarDados = (TextView) findViewById(R.id.logDados);
+        //et__name = (EditText) findViewById(R.id.et_name);
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
-        }
 
-
-        if(mBluetoothAdapter == null){
-            Toast.makeText(getApplicationContext(),"Deu ruim papai, vc não tem bluetooth", Toast.LENGTH_LONG).show();
-        }else if(!mBluetoothAdapter.isEnabled()) {
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(getApplicationContext(), "Deu ruim papai, vc não tem bluetooth", Toast.LENGTH_LONG).show();
+        } else if (!mBluetoothAdapter.isEnabled()) {
             Intent ativaBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        != PackageManager.PERMISSION_GRANTED ) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
-        }
 
         btnconect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (conexao){
+                if (conexao) {
                     //desconectar
                     try {
                         mSocket.close();
@@ -135,14 +128,14 @@ public class MainActivity extends AppCompatActivity {
                         btnconect.setText("Conectar");
 
 
-                        Toast.makeText(getApplicationContext(),"Acabou a palhaçada, desconectado.", Toast.LENGTH_LONG).show();
-                    } catch (IOException erro){
-                        Toast.makeText(getApplicationContext(),"Deu pau no vararis, erro: " + erro, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Acabou a palhaçada, desconectado.", Toast.LENGTH_LONG).show();
+                    } catch (IOException erro) {
+                        Toast.makeText(getApplicationContext(), "Deu pau no vararis, erro: " + erro, Toast.LENGTH_LONG).show();
                     }
-                }else {
+                } else {
                     //conectar
-                    Intent abreLista = new Intent(MainActivity.this,ListaDispositivos.class);
-                    startActivityForResult(abreLista,SOLICITA_BT_CON);
+                    Intent abreLista = new Intent(MainActivity.this, ListaDispositivos.class);
+                    startActivityForResult(abreLista, SOLICITA_BT_CON);
                 }
 
             }
@@ -151,10 +144,10 @@ public class MainActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (conexao){
+                if (conexao) {
                     connectedThread.enviar("Iniciar");
-                }else {
-                    Toast.makeText(getApplicationContext(),"A conexão não rolou papai", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "A conexão não rolou papai", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -162,10 +155,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (conexao){
+                if (conexao) {
                     connectedThread.enviar("Encerrar");
-                }else {
-                    Toast.makeText(getApplicationContext(),"A conexão não rolou papai", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "A conexão não rolou papai", Toast.LENGTH_LONG).show();
                 }
 
 
@@ -174,54 +167,20 @@ public class MainActivity extends AppCompatActivity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (conexao){
+                if (conexao) {
                     connectedThread.enviar("Reiniciar");
-                }else {
-                    Toast.makeText(getApplicationContext(),"A conexão não rolou papai", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "A conexão não rolou papai", Toast.LENGTH_LONG).show();
                 }
             }
         });
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String filename = et__name.getText().toString();
-                String content = logDados.getText().toString();
-
-                if (!filename.equals("") && !content.equals("")){
-                    saveTextAsFile(filename, content);
-                }
-
-            }
-        });
-
-
 
 
         //h.sendEmptyMessage(0);
 
-        h = new Handler() {
 
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case LER_MSG_BT: // if receive massage
-                        byte[] readBuf = (byte[]) msg.obj;
-                        String strIncom = new String(readBuf, 0, msg.arg1); // create
-                        // string
-                        // from
-                        // bytes array
-                        logDados.setText("Data from Arduino: " + strIncom );
-                        // update TextView
-                        h.removeMessages(0);  // clear the handler for those messages with what = 0
-                        h.sendEmptyMessageDelayed(0, 2000);
-                        break;
-                }
 
-            }
-
-        };
-    };
-
-    private void saveTextAsFile(String filename, String content) {
+    /*private void saveTextAsFile(String filename, String content) {
         String fileName = filename + ".csv";
 
         //create file
@@ -245,7 +204,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-    }
+    }*/
+    /*
     public void OnRequestPermissionsResult(int requestCode, @NonNull String [] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1000:
@@ -256,8 +216,23 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
         }
-    }
-       /* mHandler = new Handler() {
+    }*/
+
+        h = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                switch (msg.what) {
+                    case RECEIVE_MESSAGE: // if receive massage
+                        byte[] readBuf = (byte[]) msg.obj;
+                        String strIncom = new String(readBuf, 0, msg.arg1); // create
+                        // string
+                        // from
+                        // bytes array
+                        mostrarDados.setText("Data from Arduino: " + strIncom); // update TextView
+                        break;
+                }
+            }
+        };
+    }/*mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -279,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                             String dadosfinais = dadosBth.substring(1, tamanhoInfo);
 
                             Log.d("Recebidos: ", dadosfinais);
-                            TextView log_dados = (TextView)findViewById(R.id.logDados);
+                            TextView log_dados = (TextView)findViewById(R.id.mostrarDados);
                             //logDados.setText(dadosfinais);
                             Toast.makeText(getApplicationContext(),"Mensagem = " + dadosfinais, Toast.LENGTH_LONG).show();
                             //Intent msgLista = new Intent(MainActivity.this,ListaDados.class);
@@ -294,8 +269,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        };
-    }*/
+        };*/
 
 
 
@@ -367,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void run() {
-            final byte[] buffer = new byte[1024];  // buffer store for the stream
+            byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
             //TextView newramon = (TextView) findViewById(R.id.logDados);
@@ -376,20 +350,13 @@ public class MainActivity extends AppCompatActivity {
             while (true) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-
-                    String dadosBt = new String(buffer, 0, bytes);
-                    logDados.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            logDados.append(new String(buffer));
-                        }
-                    });
-
-
-                    //Send the obtained bytes to the UI activity
-                    //mHandler.obtainMessage(LER_MSG_BT, bytes, -1, dadosBt).sendToTarget();
-                    h.obtainMessage(LER_MSG_BT, bytes, -1, buffer).sendToTarget();
+                    bytes = mmInStream.read(buffer); // Get number of bytes and
+                    // message in "buffer"
+                    h.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer).sendToTarget(); // Send
+                    // to
+                    // message
+                    // queue
+                    // Handler
                 } catch (IOException e) {
                     break;
                 }
