@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         btn3 = (Button) findViewById(R.id.btn3);
-        mostrarDados = (TextView) findViewById(R.id.logDados);
+        mostrarDados = (TextView) findViewById(R.id.mostrarDados);
         //et__name = (EditText) findViewById(R.id.et_name);
 
 
