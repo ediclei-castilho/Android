@@ -67,11 +67,9 @@ public class MainActivity extends AppCompatActivity {
     Handler h;
     //static TextView statusMessage;
     final int RECEIVE_MESSAGE = 1;
-<<<<<<< HEAD
+
     private StringBuilder sb = new StringBuilder();
 
-=======
->>>>>>> b8c6c0f0b8a4fe42db0f9e8dba46f220ba005561
 
     private static final int SOLICITA_BT_ACT = 1;
     private static final int SOLICITA_BT_CON = 2;
@@ -91,10 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     Date currentTime;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> b8c6c0f0b8a4fe42db0f9e8dba46f220ba005561
     {
         currentTime = Calendar.getInstance().getTime();
     }
@@ -232,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (msg.what) {
                     case RECEIVE_MESSAGE: // if receive massage
                         byte[] readBuf = (byte[]) msg.obj;
-<<<<<<< HEAD
+
                         String strIncom = new String(readBuf, 0, msg.arg1);
                         sb.append(strIncom);												// append string
                         int endOfLineIndex = sb.indexOf("\r\n");							// determine the end-of-line
@@ -245,13 +239,11 @@ public class MainActivity extends AppCompatActivity {
                         // from
                         // bytes array
                         //mostrarDados.setText("Data from Arduino: " + strIncom); // update TextView
-=======
-                        String strIncom = new String(readBuf, 0, msg.arg1); // create
                         // string
                         // from
                         // bytes array
                         mostrarDados.setText("Data from Arduino: " + strIncom); // update TextView
->>>>>>> b8c6c0f0b8a4fe42db0f9e8dba46f220ba005561
+
                         break;
                 }
             }
