@@ -229,24 +229,17 @@ public class MainActivity extends AppCompatActivity {
 
                         String strIncom = new String(readBuf, 0, msg.arg1);
                         sb.append(strIncom);												// append string
-                        int endOfLineIndex = sb.indexOf("\r\n");							// determine the end-of-line
+                        int endOfLineIndex = sb.indexOf("}");							// determine the end-of-line
                         if (endOfLineIndex > 0) { 											// if end-of-line,
                             String sbprint = sb.substring(0, endOfLineIndex);				// extract string
                             sb.delete(0, sb.length());										// and clear
                             mostrarDados.setText("Data from Arduino: " + sbprint); 	        // update TextView
-                        }// create
-                        // string
-                        // from
-                        // bytes array
-                        //mostrarDados.setText("Data from Arduino: " + strIncom); // update TextView
-                        // string
-                        // from
-                        // bytes array
-                        mostrarDados.setText("Data from Arduino: " + strIncom); // update TextView
 
+                        }
+                        //Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
                 }
-            }
+            };
         };
     }/*mHandler = new Handler() {
             @Override
@@ -360,8 +353,6 @@ public class MainActivity extends AppCompatActivity {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
-            //TextView newramon = (TextView) findViewById(R.id.logDados);
-            //newramon.setText("dadosBtorrada");
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {

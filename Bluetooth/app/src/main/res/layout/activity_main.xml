@@ -34,7 +34,10 @@
     <TextView
         android:id="@+id/mostrarDados"
         android:layout_width="match_parent"
+        android:maxLines="8"
+        android:ellipsize="end"
         android:layout_height="wrap_content"
+
         android:text="TextView" />
 
     <Button
