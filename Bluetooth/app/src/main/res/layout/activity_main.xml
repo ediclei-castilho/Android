@@ -29,7 +29,11 @@
         android:layout_height="wrap_content"
         android:text="Restart"
         android:id="@+id/btn3"/>
-
+    
+    <EditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
 
     <TextView
         android:id="@+id/mostrarDados"

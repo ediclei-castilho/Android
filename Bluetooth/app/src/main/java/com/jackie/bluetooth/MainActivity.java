@@ -36,12 +36,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
@@ -60,13 +63,14 @@ import static android.R.layout.*;
 public class MainActivity extends AppCompatActivity {
 
     Button btnconect, btn1, btn2, btn3;
-    //ListView mensagem;
     TextView mostrarDados;
-    //EditText et__name;
-    //private static EditText logDados;
+    EditText mEditText;
     Handler h;
-    //static TextView statusMessage;
+
     final int RECEIVE_MESSAGE = 1;
+    private static final String FILE_NAME = "dados.csv";
+
+    
 
     private StringBuilder sb = new StringBuilder();
 
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         btn2 = (Button) findViewById(R.id.btn2);
         btn3 = (Button) findViewById(R.id.btn3);
         mostrarDados = (TextView) findViewById(R.id.mostrarDados);
+        mEditText = findViewById(R.id.edit_text);
         //et__name = (EditText) findViewById(R.id.et_name);
 
 
@@ -177,49 +182,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        
 
 
         //h.sendEmptyMessage(0);
-
-
-
-    /*private void saveTextAsFile(String filename, String content) {
-        String fileName = filename + ".csv";
-
-        //create file
-
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileName);
-
-        //write to file
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(content.getBytes());
-            fos.close();
-            Toast.makeText(this,"Saved!", Toast.LENGTH_SHORT).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            Toast.makeText(this,"File not found!", Toast.LENGTH_SHORT).show();
-        }catch (IOException e) {
-             e.printStackTrace();
-             Toast.makeText(this,"Error Saving!", Toast.LENGTH_SHORT).show();
-        }
-
-
-    }*/
-    /*
-    public void OnRequestPermissionsResult(int requestCode, @NonNull String [] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 1000:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(this, "Permission Granted!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-        }
-    }*/
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -229,11 +195,13 @@ public class MainActivity extends AppCompatActivity {
 
                         String strIncom = new String(readBuf, 0, msg.arg1);
                         sb.append(strIncom);												// append string
-                        int endOfLineIndex = sb.indexOf("}");							// determine the end-of-line
+                        int endOfLineIndex = sb.indexOf("\n");							// determine the end-of-line
                         if (endOfLineIndex > 0) { 											// if end-of-line,
                             String sbprint = sb.substring(0, endOfLineIndex);				// extract string
-                            sb.delete(0, sb.length());										// and clear
-                            mostrarDados.setText("Data from Arduino: " + sbprint); 	        // update TextView
+                            sb.delete(0, sb.length());
+                            mostrarDados.setText("Data from Arduino: ");
+                            // and clear
+                            mEditText.setText(sbprint); 	        // update TextView
 
                         }
                         //Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
@@ -241,7 +209,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
         };
-    }/*mHandler = new Handler() {
+    };
+
+    /*mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -266,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                             TextView log_dados = (TextView)findViewById(R.id.mostrarDados);
                             //logDados.setText(dadosfinais);
                             Toast.makeText(getApplicationContext(),"Mensagem = " + dadosfinais, Toast.LENGTH_LONG).show();
-                            //Intent msgLista = new Intent(MainActivity.this,ListaDados.class);
+                            
                             //startActivityForResult(msgLista, LST_MSG_BT);
 
 
@@ -280,7 +250,62 @@ public class MainActivity extends AppCompatActivity {
             }
         };*/
 
+    public void save(View v) {
+        String text = mEditText.getText().toString();
+        FileOutputStream fos = null;
 
+        try {
+            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            fos.write(text.getBytes());
+
+            mEditText.getText().clear();
+            Toast.makeText(this, "Saved to " + getFilesDir() + "/storage/sdcard0/Download/ " + FILE_NAME,
+                    Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void load(View v) {
+        FileInputStream fis = null;
+
+        try {
+            fis = openFileInput(FILE_NAME);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String text;
+
+            while ((text = br.readLine()) != null) {
+                sb.append(text).append("\n");
+            }
+
+            mEditText.setText(sb.toString());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
