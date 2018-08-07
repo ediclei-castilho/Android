@@ -1,10 +1,13 @@
 package com.jackie.bluetooth;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -46,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,13 +66,18 @@ import static android.R.layout.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnconect, btn1, btn2, btn3;
-    TextView mostrarDados;
+    Button btnconect, btn1, btn2, btn3, save;
+    private static TextView mostrarDados;
     EditText mEditText;
     Handler h;
+    public static final int REQUEST_PERMISSIONS_CODE = 128;
 
     final int RECEIVE_MESSAGE = 1;
     private static final String FILE_NAME = "dados.csv";
+    private TextView exibirData;
+    private TextView exibirLocalizacao;
+    private LocationManager mLocationManager;
+
 
     
 
@@ -110,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         btn3 = (Button) findViewById(R.id.btn3);
         mostrarDados = (TextView) findViewById(R.id.mostrarDados);
         mEditText = findViewById(R.id.edit_text);
-        //et__name = (EditText) findViewById(R.id.et_name);
+        save = (Button) findViewById(R.id.save);
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -122,6 +131,28 @@ public class MainActivity extends AppCompatActivity {
             Intent ativaBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
         }
+
+        SimpleDateFormat data_formatada = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss, ");
+
+        Date data = new Date();
+
+        Calendar calendario = Calendar.getInstance();
+        calendario.setTime(data);
+
+        Date data_atual = calendario.getTime();
+        String dataFormatada = data_formatada.format(data_atual);
+
+
+        exibirData = (TextView) findViewById(R.id.vData);
+        exibirData.setText(dataFormatada);
+
+        exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        onLocationChanged(location);
+
 
 
         btnconect.setOnClickListener(new View.OnClickListener() {
@@ -152,25 +183,35 @@ public class MainActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (conexao) {
-                    connectedThread.enviar("Iniciar");
-                } else {
-                    Toast.makeText(getApplicationContext(), "A conexão não rolou papai", Toast.LENGTH_LONG).show();
-                }
+                String FILENAME = "data2.csv";
+                String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
+
+
+                PrintWriter csvWriter;
+                try {
+                    StringBuffer oneLineStringBuffer = new StringBuffer();
+                    File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                    if (!file.exists()) {
+                        file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                    }
+                    csvWriter = new PrintWriter(new FileWriter(file, true));
+
+                    oneLineStringBuffer.append(entrada);
+                    csvWriter.print(oneLineStringBuffer);
+                } catch (Exception e) { e.printStackTrace(); }
             }
         });
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (conexao) {
-                    connectedThread.enviar("Encerrar");
-                } else {
-                    Toast.makeText(getApplicationContext(), "A conexão não rolou papai", Toast.LENGTH_LONG).show();
-                }
+                String FILENAME = "data2.csv";
+                String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
 
 
-            }
+                PrintWriter csvWriter;
+                try {
+                    csvWriter.close();
+                } catch (Exception e) { e.printStackTrace(); }
         });
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,7 +223,30 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        
+
+        save.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                String FILENAME = "data2.csv";
+                String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
+
+
+                PrintWriter csvWriter;
+                try {
+                    StringBuffer oneLineStringBuffer = new StringBuffer();
+                    File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                    if (!file.exists()) {
+                        file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                    }
+                    csvWriter = new PrintWriter(new FileWriter(file, true));
+
+                    oneLineStringBuffer.append(entrada);
+                    csvWriter.print(oneLineStringBuffer);
+                    csvWriter.close();
+                } catch (Exception e) { e.printStackTrace(); }
+            }
+        });
+
 
 
         //h.sendEmptyMessage(0);
@@ -193,6 +257,10 @@ public class MainActivity extends AppCompatActivity {
                     case RECEIVE_MESSAGE: // if receive massage
                         byte[] readBuf = (byte[]) msg.obj;
 
+                        /*String readMessage = new String(readBuf, 0, msg.arg1);
+                        //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                        mostrarDados.setText(readMessage);
+                        break;*/
                         String strIncom = new String(readBuf, 0, msg.arg1);
                         sb.append(strIncom);												// append string
                         int endOfLineIndex = sb.indexOf("\n");							// determine the end-of-line
@@ -250,6 +318,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };*/
 
+    public void onLocationChanged(Location location) {
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        exibirLocalizacao.setText(longitude + ", " + latitude);
+    }
     public void save(View v) {
         String text = mEditText.getText().toString();
         FileOutputStream fos = null;
@@ -259,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
             fos.write(text.getBytes());
 
             mEditText.getText().clear();
-            Toast.makeText(this, "Saved to " + getFilesDir() + "/storage/sdcard0/Download/ " + FILE_NAME,
+            Toast.makeText(this, "Saved to " + getFilesDir() + "/storage/sdcard0/Download/" + FILE_NAME,
                     Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -306,6 +379,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        //Log.i(TAG, "test");
+        switch( requestCode ){
+            case REQUEST_PERMISSIONS_CODE:
+                for( int i = 0; i < permissions.length; i++ ){
+
+                    if( permissions[i].equalsIgnoreCase( Manifest.permission.ACCESS_FINE_LOCATION )
+                            && grantResults[i] == PackageManager.PERMISSION_GRANTED ){
+
+                        //readMyCurrentCoordinates();
+                    }
+                    else if( permissions[i].equalsIgnoreCase( Manifest.permission.WRITE_EXTERNAL_STORAGE )
+                            && grantResults[i] == PackageManager.PERMISSION_GRANTED ){
+
+                        //createDeleteFolder();
+                    }
+                    else if( permissions[i].equalsIgnoreCase( Manifest.permission.READ_EXTERNAL_STORAGE )
+                            && grantResults[i] == PackageManager.PERMISSION_GRANTED ){
+
+                        //readFile(Environment.getExternalStorageDirectory().toString() + "/myFolder");
+                    }
+                }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -385,10 +486,7 @@ public class MainActivity extends AppCompatActivity {
                     bytes = mmInStream.read(buffer); // Get number of bytes and
                     // message in "buffer"
                     h.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer).sendToTarget(); // Send
-                    // to
-                    // message
-                    // queue
-                    // Handler
+                    // to message queue // Handler
                 } catch (IOException e) {
                     break;
                 }

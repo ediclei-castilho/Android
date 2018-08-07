@@ -5,7 +5,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -23,14 +24,6 @@
         </activity>
         <activity android:name=".ListaDispositivos"
             android:label="Dispositivos Pareados"
-            android:theme="@android:style/Theme.Dialog"
-            />
-        <activity android:name=".ListaDados"
-            android:label="Lista de dados"
-            android:theme="@android:style/Theme.Dialog"
-            />
-        <activity android:name=".ListaDados$ListaDeCursosActivity"
-            android:label="Listar"
             android:theme="@android:style/Theme.Dialog"
             />
     </application>
