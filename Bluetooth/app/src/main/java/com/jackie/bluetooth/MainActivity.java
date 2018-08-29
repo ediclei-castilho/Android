@@ -2,6 +2,7 @@ package com.jackie.bluetooth;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,6 +52,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SOLICITA_BT_CON = 2;
     private static final int LER_MSG_BT = 3;
     private static final int LST_MSG_BT = 4;
+    private static int helper = 0;
     ConnectedThread connectedThread;
     Handler mHandler;
     StringBuilder dadosBth = new StringBuilder();
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (mBluetoothAdapter == null) {
-            Toast.makeText(getApplicationContext(), "Deu ruim papai, vc não tem bluetooth", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Adaptador Bluetooth não encontrado!", Toast.LENGTH_LONG).show();
         } else if (!mBluetoothAdapter.isEnabled()) {
             Intent ativaBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
@@ -167,9 +172,9 @@ public class MainActivity extends AppCompatActivity {
                         btnconect.setText("Conectar");
 
 
-                        Toast.makeText(getApplicationContext(), "Acabou a palhaçada, desconectado.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Sensor desconectado.", Toast.LENGTH_LONG).show();
                     } catch (IOException erro) {
-                        Toast.makeText(getApplicationContext(), "Deu pau no vararis, erro: " + erro, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Erro: " + erro, Toast.LENGTH_LONG).show();
                     }
                 } else {
                     //conectar
@@ -185,41 +190,39 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String FILENAME = "data2.csv";
                 String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
-
+                helper = 1;
 
                 PrintWriter csvWriter;
-                try {
-                    StringBuffer oneLineStringBuffer = new StringBuffer();
-                    File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                    if (!file.exists()) {
-                        file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                    }
-                    csvWriter = new PrintWriter(new FileWriter(file, true));
+                while(helper==1){
+                    try {
+                        StringBuffer oneLineStringBuffer = new StringBuffer();
+                        File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                        if (!file.exists()) {
+                            file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                        }
+                        csvWriter = new PrintWriter(new FileWriter(file, true));
 
-                    oneLineStringBuffer.append(entrada);
-                    csvWriter.print(oneLineStringBuffer);
-                } catch (Exception e) { e.printStackTrace(); }
+                        oneLineStringBuffer.append(entrada);
+                        csvWriter.print(oneLineStringBuffer);
+                        csvWriter.close();
+                    } catch (Exception e) { e.printStackTrace(); }
+                }
             }
         });
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String FILENAME = "data2.csv";
-                String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
-
-
-                PrintWriter csvWriter;
-                try {
-                    csvWriter.close();
-                } catch (Exception e) { e.printStackTrace(); }
+                helper = 0;
+            }
         });
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (conexao) {
                     connectedThread.enviar("Reiniciar");
+                    new UploadFileAsync().execute("");
                 } else {
-                    Toast.makeText(getApplicationContext(), "A conexão não rolou papai", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Erro de Conexão.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -247,20 +250,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-        //h.sendEmptyMessage(0);
-
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
                     case RECEIVE_MESSAGE: // if receive massage
                         byte[] readBuf = (byte[]) msg.obj;
 
-                        /*String readMessage = new String(readBuf, 0, msg.arg1);
-                        //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
-                        mostrarDados.setText(readMessage);
-                        break;*/
                         String strIncom = new String(readBuf, 0, msg.arg1);
                         sb.append(strIncom);												// append string
                         int endOfLineIndex = sb.indexOf("\n");							// determine the end-of-line
@@ -279,44 +274,6 @@ public class MainActivity extends AppCompatActivity {
         };
     };
 
-    /*mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if (msg.what == LER_MSG_BT) {
-
-                    String recebidos = (String) msg.obj;
-                    Bundle params = new Bundle();
-                    dadosBth.append(recebidos);
-
-                    int fimInfo = dadosBth.indexOf("}");
-
-                    if (fimInfo > 0) {
-                        String dadoscompletos = dadosBth.substring(0, fimInfo);
-
-                        int tamanhoInfo = dadoscompletos.length();
-
-                        if (dadosBth.charAt(0) == '{') {
-
-                            String dadosfinais = dadosBth.substring(1, tamanhoInfo);
-
-                            Log.d("Recebidos: ", dadosfinais);
-                            TextView log_dados = (TextView)findViewById(R.id.mostrarDados);
-                            //logDados.setText(dadosfinais);
-                            Toast.makeText(getApplicationContext(),"Mensagem = " + dadosfinais, Toast.LENGTH_LONG).show();
-                            
-                            //startActivityForResult(msgLista, LST_MSG_BT);
-
-
-
-
-                        }
-
-                        dadosBth.delete(0, dadosBth.length());
-                    }
-                }
-            }
-        };*/
 
     public void onLocationChanged(Location location) {
         double longitude = location.getLongitude();
@@ -415,9 +372,9 @@ public class MainActivity extends AppCompatActivity {
 
             case SOLICITA_BT_ACT:
                 if(resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(getApplicationContext(),"Esse é o bixão mesmo! Vamo lá...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Bluetooth ativado com sucesso.", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(),"Deu ruim papai, sem bluetooth eu vou embora", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Ativação do Bluetooth necessária para a execução da aplicação!", Toast.LENGTH_LONG).show();
                     finish();
                 }
                 break;
@@ -439,15 +396,15 @@ public class MainActivity extends AppCompatActivity {
                         connectedThread.start();
 
                         btnconect.setText("Desconectar");
-                        Toast.makeText(getApplicationContext(),"Você é ráquizão memo, tamo online no arduino ", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Conexão efetuada com sucesso.", Toast.LENGTH_LONG).show();
 
                     } catch (IOException erro){
 
                         conexao = false;
-                        Toast.makeText(getApplicationContext(),"Ih carai, deu ruim aqui na conexão, erro: " + erro, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Falha durante a conexão, erro: " + erro, Toast.LENGTH_LONG).show();
                     }
                 }else{
-                    Toast.makeText(getApplicationContext(),"Deu ruim papai,MAC lixo não pegou", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Erro ao obter o Endereço MAC.", Toast.LENGTH_LONG).show();
                 }
 
 
@@ -503,19 +460,132 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    private class UploadFileAsync extends AsyncTask<String, Void, String> {
 
-    /*public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == MY_LOCATION_REQUEST_CODE) {
-            if (permissions.length == 1 &&
-                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mMap.setMyLocationEnabled(true);
-            } else {
-                // Permission was denied. Display an error message.
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                String sourceFileUri = "storage/sdcard0/Download/data2.csv";
+
+                HttpURLConnection conn = null;
+                DataOutputStream dos = null;
+                String lineEnd = "\r\n";
+                String twoHyphens = "--";
+                String boundary = "*****";
+                int bytesRead, bytesAvailable, bufferSize;
+                byte[] buffer;
+                int maxBufferSize = 1 * 1024 * 1024;
+                File sourceFile = new File(sourceFileUri);
+
+                if (sourceFile.isFile()) {
+
+                    try {
+                        String upLoadServerUri = "http://website.com/abc.php?";
+
+                        // open a URL connection to the Servlet
+                        FileInputStream fileInputStream = new FileInputStream(
+                                sourceFile);
+                        URL url = new URL(upLoadServerUri);
+
+                        // Open a HTTP connection to the URL
+                        conn = (HttpURLConnection) url.openConnection();
+                        conn.setDoInput(true); // Allow Inputs
+                        conn.setDoOutput(true); // Allow Outputs
+                        conn.setUseCaches(false); // Don't use a Cached Copy
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Connection", "Keep-Alive");
+                        conn.setRequestProperty("ENCTYPE",
+                                "multipart/form-data");
+                        conn.setRequestProperty("Content-Type",
+                                "multipart/form-data;boundary=" + boundary);
+                        conn.setRequestProperty("bill", sourceFileUri);
+
+                        dos = new DataOutputStream(conn.getOutputStream());
+
+                        dos.writeBytes(twoHyphens + boundary + lineEnd);
+                        dos.writeBytes("Content-Disposition: form-data; name=\"bill\";filename=\""
+                                + sourceFileUri + "\"" + lineEnd);
+
+                        dos.writeBytes(lineEnd);
+
+                        // create a buffer of maximum size
+                        bytesAvailable = fileInputStream.available();
+
+                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                        buffer = new byte[bufferSize];
+
+                        // read file and write it into form...
+                        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                        while (bytesRead > 0) {
+
+                            dos.write(buffer, 0, bufferSize);
+                            bytesAvailable = fileInputStream.available();
+                            bufferSize = Math
+                                    .min(bytesAvailable, maxBufferSize);
+                            bytesRead = fileInputStream.read(buffer, 0,
+                                    bufferSize);
+
+                        }
+
+                        // send multipart form data necesssary after file
+                        // data...
+                        dos.writeBytes(lineEnd);
+                        dos.writeBytes(twoHyphens + boundary + twoHyphens
+                                + lineEnd);
+
+                        // Responses from the server (code and message)
+                        int serverResponseCode = conn.getResponseCode();
+                        String serverResponseMessage = conn
+                                .getResponseMessage();
+
+                        if (serverResponseCode == 200) {
+
+                            // messageText.setText(msg);
+                            //Toast.makeText(ctx, "File Upload Complete.",
+                            //      Toast.LENGTH_SHORT).show();
+
+                            // recursiveDelete(mDirectory1);
+
+                        }
+
+                        // close the streams //
+                        fileInputStream.close();
+                        dos.flush();
+                        dos.close();
+
+                    } catch (Exception e) {
+
+                        // dialog.dismiss();
+                        e.printStackTrace();
+
+                    }
+                    // dialog.dismiss();
+
+                } // End else block
+
+
+            } catch (Exception ex) {
+                // dialog.dismiss();
+
+                ex.printStackTrace();
             }
-        }*/
+            return "Executed";
+        }
 
+        @Override
+        protected void onPostExecute(String result) {
 
+        }
 
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
 
 }
