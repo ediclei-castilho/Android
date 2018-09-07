@@ -3,42 +3,25 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
-
 
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.MediaRouteButton;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -54,30 +37,21 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import java.util.Calendar;
 
-import static android.R.*;
-import static android.R.layout.*;
-
 public class MainActivity extends AppCompatActivity {
 
-    Button btnconect, btn1, btn2, btn3, save;
+    Button btnconect, btn1, btn2, save;
     private static TextView mostrarDados;
     EditText mEditText;
     Handler h;
     public static final int REQUEST_PERMISSIONS_CODE = 128;
 
     final int RECEIVE_MESSAGE = 1;
-    private static final String FILE_NAME = "dados.csv";
     private TextView exibirData;
     private TextView exibirLocalizacao;
     private LocationManager mLocationManager;
@@ -90,12 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SOLICITA_BT_ACT = 1;
     private static final int SOLICITA_BT_CON = 2;
-    private static final int LER_MSG_BT = 3;
-    private static final int LST_MSG_BT = 4;
     private static int helper = 0;
     ConnectedThread connectedThread;
-    Handler mHandler;
-    StringBuilder dadosBth = new StringBuilder();
     BluetoothAdapter mBluetoothAdapter = null;
     BluetoothDevice mDevice = null;
     BluetoothSocket mSocket = null;
@@ -121,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         btnconect = (Button) findViewById(R.id.btnconect);
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
-        btn3 = (Button) findViewById(R.id.btn3);
         mostrarDados = (TextView) findViewById(R.id.mostrarDados);
         mEditText = findViewById(R.id.edit_text);
         save = (Button) findViewById(R.id.save);
@@ -137,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
         }
 
-        SimpleDateFormat data_formatada = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss, ");
+        SimpleDateFormat data_formatada = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
         Date data = new Date();
 
@@ -188,25 +157,8 @@ public class MainActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String FILENAME = "data2.csv";
-                String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
                 helper = 1;
 
-                PrintWriter csvWriter;
-                while(helper==1){
-                    try {
-                        StringBuffer oneLineStringBuffer = new StringBuffer();
-                        File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                        if (!file.exists()) {
-                            file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                        }
-                        csvWriter = new PrintWriter(new FileWriter(file, true));
-
-                        oneLineStringBuffer.append(entrada);
-                        csvWriter.print(oneLineStringBuffer);
-                        csvWriter.close();
-                    } catch (Exception e) { e.printStackTrace(); }
-                }
             }
         });
         btn2.setOnClickListener(new View.OnClickListener() {
@@ -215,38 +167,12 @@ public class MainActivity extends AppCompatActivity {
                 helper = 0;
             }
         });
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (conexao) {
-                    connectedThread.enviar("Reiniciar");
-                    new UploadFileAsync().execute("");
-                } else {
-                    Toast.makeText(getApplicationContext(), "Erro de Conexão.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+
 
         save.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                String FILENAME = "data2.csv";
-                String entrada = exibirData.getText().toString() + ", " +mEditText.getText().toString()+", " + exibirLocalizacao.getText().toString() + "\n";
-
-
-                PrintWriter csvWriter;
-                try {
-                    StringBuffer oneLineStringBuffer = new StringBuffer();
-                    File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                    if (!file.exists()) {
-                        file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                    }
-                    csvWriter = new PrintWriter(new FileWriter(file, true));
-
-                    oneLineStringBuffer.append(entrada);
-                    csvWriter.print(oneLineStringBuffer);
-                    csvWriter.close();
-                } catch (Exception e) { e.printStackTrace(); }
+                new UploadFileAsync().execute("");
             }
         });
 
@@ -265,6 +191,25 @@ public class MainActivity extends AppCompatActivity {
                             mostrarDados.setText("Data from Arduino: ");
                             // and clear
                             mEditText.setText(sbprint); 	        // update TextView
+                            String FILENAME = "Download/LogSensores.csv";
+                            String entrada = exibirData.getText().toString() + "," +mEditText.getText().toString()+"," + exibirLocalizacao.getText().toString() + "\n";
+
+
+                            PrintWriter csvWriter;
+                            if( helper == 1){
+                            try {
+                                StringBuffer oneLineStringBuffer = new StringBuffer();
+                                File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                if (!file.exists()) {
+                                    file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                }
+                                csvWriter = new PrintWriter(new FileWriter(file, true));
+
+                                oneLineStringBuffer.append(entrada);
+                                csvWriter.print(oneLineStringBuffer);
+                                csvWriter.close();
+                            } catch (Exception e) { e.printStackTrace(); }
+                            }
 
                         }
                         //Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
@@ -280,63 +225,7 @@ public class MainActivity extends AppCompatActivity {
         double latitude = location.getLatitude();
         exibirLocalizacao.setText(longitude + ", " + latitude);
     }
-    public void save(View v) {
-        String text = mEditText.getText().toString();
-        FileOutputStream fos = null;
-
-        try {
-            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
-            fos.write(text.getBytes());
-
-            mEditText.getText().clear();
-            Toast.makeText(this, "Saved to " + getFilesDir() + "/storage/sdcard0/Download/" + FILE_NAME,
-                    Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public void load(View v) {
-        FileInputStream fis = null;
-
-        try {
-            fis = openFileInput(FILE_NAME);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-            StringBuilder sb = new StringBuilder();
-            String text;
-
-            while ((text = br.readLine()) != null) {
-                sb.append(text).append("\n");
-            }
-
-            mEditText.setText(sb.toString());
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
+  
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         //Log.i(TAG, "test");
@@ -460,13 +349,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
     private class UploadFileAsync extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
 
             try {
-                String sourceFileUri = "storage/sdcard0/Download/data2.csv";
+                String sourceFileUri = "storage/sdcard0/Download/LogSensores.csv";
 
                 HttpURLConnection conn = null;
                 DataOutputStream dos = null;
