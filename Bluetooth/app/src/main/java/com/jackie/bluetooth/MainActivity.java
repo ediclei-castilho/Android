@@ -23,6 +23,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -169,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
         save.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -192,8 +198,17 @@ public class MainActivity extends AppCompatActivity {
                             // and clear
                             mEditText.setText(sbprint); 	        // update TextView
                             String FILENAME = "Download/LogSensores.csv";
-                            String entrada = exibirData.getText().toString() + "," +mEditText.getText().toString()+"," + exibirLocalizacao.getText().toString() + "\n";
+                            String entrada = exibirData.getText().toString() + "," + sbprint +"," + exibirLocalizacao.getText().toString() + "\n";
 
+                            GraphView graph = (GraphView) findViewById(R.id.graph);
+                            LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
+                                    new DataPoint(0, 1),
+                                    new DataPoint(1, 5),
+                                    new DataPoint(2, 3),
+                                    new DataPoint(3, 2),
+                                    new DataPoint(4, 6)
+                            });
+                            graph.addSeries(series);
 
                             PrintWriter csvWriter;
                             if( helper == 1){
@@ -223,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
     public void onLocationChanged(Location location) {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
-        exibirLocalizacao.setText(longitude + ", " + latitude);
+        exibirLocalizacao.setText(longitude + "," + latitude);
     }
   
     @Override

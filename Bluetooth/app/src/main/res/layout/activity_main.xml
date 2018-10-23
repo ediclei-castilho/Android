@@ -46,7 +46,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-        <Button
+    <com.jjoe64.graphview.GraphView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/graph" />
+
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Enviar para servidor"
