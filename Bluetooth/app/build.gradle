@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.jackie.bluetooth"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -27,4 +27,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.0'
     implementation 'com.jjoe64:graphview:4.2.1'
+
+    implementation 'com.github.Pygmalion69:Gauge:1.4'
 }

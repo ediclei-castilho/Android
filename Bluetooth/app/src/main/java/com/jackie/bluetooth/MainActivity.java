@@ -200,15 +200,7 @@ public class MainActivity extends AppCompatActivity {
                             String FILENAME = "Download/LogSensores.csv";
                             String entrada = exibirData.getText().toString() + "," + sbprint +"," + exibirLocalizacao.getText().toString() + "\n";
 
-                            GraphView graph = (GraphView) findViewById(R.id.graph);
-                            LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
-                                    new DataPoint(0, 1),
-                                    new DataPoint(1, 5),
-                                    new DataPoint(2, 3),
-                                    new DataPoint(3, 2),
-                                    new DataPoint(4, 6)
-                            });
-                            graph.addSeries(series);
+
 
                             PrintWriter csvWriter;
                             if( helper == 1){

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:gauge="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
 
     <Button
         android:layout_width="match_parent"
@@ -22,34 +24,98 @@
         android:id="@+id/btn2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Parar" /> 
+        android:text="Parar" />
 
     <TextView
         android:id="@+id/mostrarDados"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:text="TextView" />
+        android:text="TextView"
+        android:visibility="invisible" />
 
     <EditText
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="10dp" />
 
     <TextView
         android:id="@+id/vData"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="1dp"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/vLocalizacao"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="1dp"
+        android:visibility="invisible" />
 
-    <com.jjoe64.graphview.GraphView
+    <de.nitri.gauge.Gauge
+        android:id="@+id/gauge"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="center"
+        gauge:initialValue="50"
+        gauge:maxValue="100"
+        gauge:minValue="0"
+        gauge:totalNicks="100"
+        gauge:valuePerNick="1" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:id="@+id/graph" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:context="com.jackie.bluetooth.MainActivity">
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/gauge2"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
+            gauge:initialValue="22"
+            gauge:maxValue="100"
+            gauge:minValue="0"
+            gauge:totalNicks="100"
+            gauge:valuePerNick="1" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/gauge3"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
+            gauge:majorNickInterval="20"
+            gauge:maxValue="100"
+            gauge:minValue="0"
+            gauge:totalNicks="100"
+            gauge:valuePerNick="1" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/gauge4"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="2dp"
+            gauge:initialValue="22"
+            gauge:maxValue="100"
+            gauge:minValue="0"
+            gauge:totalNicks="100"
+            gauge:valuePerNick="1" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/gauge5"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            gauge:majorNickInterval="20"
+            gauge:maxValue="100"
+            gauge:minValue="0"
+            gauge:totalNicks="100"
+            gauge:valuePerNick="1" />
+    </LinearLayout>
 
     <Button
         android:layout_width="match_parent"
