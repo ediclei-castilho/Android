@@ -5,6 +5,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -48,11 +49,16 @@ import java.util.UUID;
 
 import java.util.Calendar;
 
+import de.nitri.gauge.Gauge;
+
 public class MainActivity extends AppCompatActivity {
 
     Button btnconect, btn1, btn2, save;
-    private static TextView mostrarDados;
-    EditText mEditText;
+    private EditText mostrarDados;
+    private EditText mEditText;
+    private EditText mServerAddress;
+
+    String header = "Date, Temperature, Humidty, CO level, CO2 level, mp25, Location, id";
     Handler h;
     public static final int REQUEST_PERMISSIONS_CODE = 128;
 
@@ -60,6 +66,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView exibirData;
     private TextView exibirLocalizacao;
     private LocationManager mLocationManager;
+
+    private Gauge mGaugeTemperature;
+    private Gauge mGaugeHumidity;
+    private Gauge mCoGraph;
+    private Gauge mGauge4;
+    private Gauge mGauge5;
+
+
 
 
     
@@ -96,9 +110,15 @@ public class MainActivity extends AppCompatActivity {
         btnconect = (Button) findViewById(R.id.btnconect);
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
-        mostrarDados = (TextView) findViewById(R.id.mostrarDados);
+        mostrarDados = findViewById(R.id.mostrarDados);
         mEditText = findViewById(R.id.edit_text);
         save = (Button) findViewById(R.id.save);
+        mGaugeTemperature = findViewById(R.id.gauge);
+        mGaugeHumidity = findViewById(R.id.gauge2);
+        mCoGraph = findViewById(R.id.gauge3);
+        mGauge4 = findViewById(R.id.gauge4);
+        mGauge5 = findViewById(R.id.gauge5);
+        mServerAddress = findViewById(R.id.serveraddress);
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -128,9 +148,12 @@ public class MainActivity extends AppCompatActivity {
         exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(permissionCheck == PackageManager.PERMISSION_GRANTED){
         Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        onLocationChanged(location);
+        onLocationChanged(location);}
+
 
 
 
@@ -144,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         mSocket.close();
                         conexao = false;
                         btnconect.setText("Conectar");
+                        mostrarDados.setEnabled(true);
 
 
                         Toast.makeText(getApplicationContext(), "Sensor desconectado.", Toast.LENGTH_LONG).show();
@@ -155,10 +179,8 @@ public class MainActivity extends AppCompatActivity {
                     Intent abreLista = new Intent(MainActivity.this, ListaDispositivos.class);
                     startActivityForResult(abreLista, SOLICITA_BT_CON);
                 }
-
             }
         });
-
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,15 +194,13 @@ public class MainActivity extends AppCompatActivity {
                 helper = 0;
             }
         });
-
-
-
         save.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 new UploadFileAsync().execute("");
             }
         });
+
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -194,13 +214,25 @@ public class MainActivity extends AppCompatActivity {
                         if (endOfLineIndex > 0) { 											// if end-of-line,
                             String sbprint = sb.substring(0, endOfLineIndex);				// extract string
                             sb.delete(0, sb.length());
-                            mostrarDados.setText("Data from Arduino: ");
                             // and clear
                             mEditText.setText(sbprint); 	        // update TextView
                             String FILENAME = "Download/LogSensores.csv";
-                            String entrada = exibirData.getText().toString() + "," + sbprint +"," + exibirLocalizacao.getText().toString() + "\n";
+                            String entrada = exibirData.getText().toString() + "," + sbprint +"," + exibirLocalizacao.getText().toString() + mostrarDados.getText().toString() + "\n";
 
+                            String items[] = sbprint.split(",");
+                            for (int i =0;i<5;i++) {
+                                if (i ==0){
+                                    mGaugeTemperature.moveToValue(Float.valueOf(items[i]).intValue());}
+                                if (i ==1){
+                                    mGaugeHumidity.moveToValue(Float.valueOf(items[i]).intValue());}
+                                if (i ==2){
+                                    mCoGraph.moveToValue(Float.valueOf(items[i]).intValue());}
+                                if (i ==3){
+                                    mGauge4.moveToValue(Float.valueOf(items[i]).intValue());}
+                                if (i ==4){
+                                    mGauge5.moveToValue(Float.valueOf(items[i]).intValue());}
 
+                            }
 
                             PrintWriter csvWriter;
                             if( helper == 1){
@@ -209,9 +241,12 @@ public class MainActivity extends AppCompatActivity {
                                 File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
                                 if (!file.exists()) {
                                     file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                    csvWriter = new PrintWriter(new FileWriter(file, true));
+                                    oneLineStringBuffer.append(header);
+                                    csvWriter.print(oneLineStringBuffer);
+                                    csvWriter.close();
                                 }
                                 csvWriter = new PrintWriter(new FileWriter(file, true));
-
                                 oneLineStringBuffer.append(entrada);
                                 csvWriter.print(oneLineStringBuffer);
                                 csvWriter.close();
@@ -231,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         exibirLocalizacao.setText(longitude + "," + latitude);
+
     }
   
     @Override
@@ -290,6 +326,7 @@ public class MainActivity extends AppCompatActivity {
 
                         connectedThread = new ConnectedThread(mSocket);
                         connectedThread.start();
+                        mostrarDados.setEnabled(false);
 
                         btnconect.setText("Desconectar");
                         Toast.makeText(getApplicationContext(),"Conexão efetuada com sucesso.", Toast.LENGTH_LONG).show();
@@ -298,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
 
                         conexao = false;
                         Toast.makeText(getApplicationContext(),"Falha durante a conexão, erro: " + erro, Toast.LENGTH_LONG).show();
+                        mostrarDados.setEnabled(true);
                     }
                 }else{
                     Toast.makeText(getApplicationContext(),"Erro ao obter o Endereço MAC.", Toast.LENGTH_LONG).show();
@@ -345,22 +383,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
-        /* Call this from the main activity to send data to the remote device */
-        public void enviar (String dadosEnviar) {
-            byte[] msgBuffer = dadosEnviar.getBytes();
-            try {
-                mmOutStream.write(msgBuffer);
-            } catch (IOException e) { }
-        }
-
-
     }
 
     private class UploadFileAsync extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
+            save.setText("AGUARDE...");
+
 
             try {
                 String sourceFileUri = "storage/sdcard0/Download/LogSensores.csv";
@@ -378,7 +408,8 @@ public class MainActivity extends AppCompatActivity {
                 if (sourceFile.isFile()) {
 
                     try {
-                        String upLoadServerUri = "http://website.com/abc.php?";
+                        mServerAddress.setEnabled(false);
+                        String upLoadServerUri = mServerAddress.getText().toString();
 
                         // open a URL connection to the Servlet
                         FileInputStream fileInputStream = new FileInputStream(
@@ -439,9 +470,8 @@ public class MainActivity extends AppCompatActivity {
 
                         if (serverResponseCode == 200) {
 
-                            // messageText.setText(msg);
-                            //Toast.makeText(ctx, "File Upload Complete.",
-                            //      Toast.LENGTH_SHORT).show();
+                            save.setText("Feito!");
+                            Toast.makeText(getApplicationContext(),"Enviado com sucesso.", Toast.LENGTH_LONG).show();
 
                             // recursiveDelete(mDirectory1);
 
