@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mEditText;
     private EditText mServerAddress;
 
-    String header = "Date, Temperature, Humidty, CO level, CO2 level, mp25, Location, id";
+    String header = "Date, Temperature, Humidity, CO level, CO2 level, mp25, Location, id \n";
     Handler h;
     public static final int REQUEST_PERMISSIONS_CODE = 128;
 
@@ -219,20 +219,7 @@ public class MainActivity extends AppCompatActivity {
                             String FILENAME = "Download/LogSensores.csv";
                             String entrada = exibirData.getText().toString() + "," + sbprint +"," + exibirLocalizacao.getText().toString() + mostrarDados.getText().toString() + "\n";
 
-                            String items[] = sbprint.split(",");
-                            for (int i =0;i<5;i++) {
-                                if (i ==0){
-                                    mGaugeTemperature.moveToValue(Float.valueOf(items[i]).intValue());}
-                                if (i ==1){
-                                    mGaugeHumidity.moveToValue(Float.valueOf(items[i]).intValue());}
-                                if (i ==2){
-                                    mCoGraph.moveToValue(Float.valueOf(items[i]).intValue());}
-                                if (i ==3){
-                                    mGauge4.moveToValue(Float.valueOf(items[i]).intValue());}
-                                if (i ==4){
-                                    mGauge5.moveToValue(Float.valueOf(items[i]).intValue());}
 
-                            }
 
                             PrintWriter csvWriter;
                             if( helper == 1){
@@ -265,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
     public void onLocationChanged(Location location) {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
-        exibirLocalizacao.setText(longitude + "," + latitude);
+        exibirLocalizacao.setText(longitude + " / " + latitude);
 
     }
   
