@@ -5,6 +5,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
@@ -83,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SOLICITA_BT_ACT = 1;
     private static final int SOLICITA_BT_CON = 2;
+    private static final int PERMISSAO_REQUEST = 1;
+    private static final int LOCATION_REQUEST = 1;
+    private static final int LOCATION2_REQUEST = 1;
     private static int helper = 0;
     ConnectedThread connectedThread;
     BluetoothAdapter mBluetoothAdapter = null;
@@ -123,12 +127,47 @@ public class MainActivity extends AppCompatActivity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-
+        //PERMISSAO BLUETOOTH
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "Adaptador Bluetooth não encontrado!", Toast.LENGTH_LONG).show();
         } else if (!mBluetoothAdapter.isEnabled()) {
             Intent ativaBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
+        }
+        //PERMISSAO PARA LER
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSAO_REQUEST);
+            }
+        }
+        //PERMISSAO PARA ESCREVER
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_REQUEST);
+            }
+        }
+        //PERMISSAO LOCALIZACAO
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION2_REQUEST);
+            }
         }
 
         SimpleDateFormat data_formatada = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -255,34 +294,6 @@ public class MainActivity extends AppCompatActivity {
         exibirLocalizacao.setText(longitude + " / " + latitude);
 
     }
-  
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        //Log.i(TAG, "test");
-        switch( requestCode ){
-            case REQUEST_PERMISSIONS_CODE:
-                for( int i = 0; i < permissions.length; i++ ){
-
-                    if( permissions[i].equalsIgnoreCase( Manifest.permission.ACCESS_FINE_LOCATION )
-                            && grantResults[i] == PackageManager.PERMISSION_GRANTED ){
-
-                        //readMyCurrentCoordinates();
-                    }
-                    else if( permissions[i].equalsIgnoreCase( Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                            && grantResults[i] == PackageManager.PERMISSION_GRANTED ){
-
-                        //createDeleteFolder();
-                    }
-                    else if( permissions[i].equalsIgnoreCase( Manifest.permission.READ_EXTERNAL_STORAGE )
-                            && grantResults[i] == PackageManager.PERMISSION_GRANTED ){
-
-                        //readFile(Environment.getExternalStorageDirectory().toString() + "/myFolder");
-                    }
-                }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
