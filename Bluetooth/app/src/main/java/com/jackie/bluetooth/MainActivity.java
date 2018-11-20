@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
     String header = "Date, Temperature, Humidity, CO, CO2, mp25, id \n";
     Handler h;
-    public static final int REQUEST_PERMISSIONS_CODE = 128;
 
     final int RECEIVE_MESSAGE = 1;
     private TextView exibirData;
@@ -86,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int SOLICITA_BT_ACT = 1;
     private static final int SOLICITA_BT_CON = 2;
     private static final int PERMISSAO_REQUEST = 1;
+    private static final int PERMISSAO1_REQUEST = 1;
     private static final int LOCATION_REQUEST = 1;
-    private static final int LOCATION2_REQUEST = 1;
     private static int helper = 0;
     ConnectedThread connectedThread;
     BluetoothAdapter mBluetoothAdapter = null;
@@ -135,22 +134,15 @@ public class MainActivity extends AppCompatActivity {
             Intent ativaBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
         }
-        //PERMISSAO PARA LER
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSAO_REQUEST);
-            }
-        }
-        //PERMISSAO PARA ESCREVER
+        //PERMISSAO PARA LER E ESCREVER
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_REQUEST);
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSAO1_REQUEST);
             }
         }
         //PERMISSAO LOCALIZACAO
@@ -160,14 +152,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
-            }
-        }
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION2_REQUEST);
             }
         }
 
@@ -188,12 +172,7 @@ public class MainActivity extends AppCompatActivity {
         exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        if(permissionCheck == PackageManager.PERMISSION_GRANTED){
-        Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        onLocationChanged(location);}
-
+        final Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
 
 
@@ -255,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                             String sbprint = sb.substring(0, endOfLineIndex);				// extract string
                             sb.delete(0, sb.length());
                             // and clear
+                            onLocationChanged(location);
                             mEditText.setText(sbprint); 	        // update TextView
                             String FILENAME = "Download/LogSensores.csv";
                             String entrada = exibirData.getText().toString() + "," + sbprint +"," + mostrarDados.getText().toString() + exibirLocalizacao.getText().toString()  + "\n";
@@ -267,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                                 StringBuffer oneLineStringBuffer = new StringBuffer();
                                 File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
                                 if (!file.exists()) {
-                                    //file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                    file = new File(Environment.getExternalStorageDirectory(), FILENAME);
                                     csvWriter = new PrintWriter(new FileWriter(file, true));
                                     oneLineStringBuffer.append(header);
                                     csvWriter.print(oneLineStringBuffer);
@@ -502,5 +482,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(Void... values) {
         }
     }
+
+
 
 }
