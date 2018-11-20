@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mEditText;
     private EditText mServerAddress;
 
-    String header = "Date, Temperature, Humidity, CO level, CO2 level, mp25, Location, id \n";
+    String header = "Date, Temperature, Humidity, CO, CO2, mp25, id \n";
     Handler h;
     public static final int REQUEST_PERMISSIONS_CODE = 128;
 
@@ -217,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                             // and clear
                             mEditText.setText(sbprint); 	        // update TextView
                             String FILENAME = "Download/LogSensores.csv";
-                            String entrada = exibirData.getText().toString() + "," + sbprint +"," + exibirLocalizacao.getText().toString() + mostrarDados.getText().toString() + "\n";
+                            String entrada = exibirData.getText().toString() + "," + sbprint +"," + mostrarDados.getText().toString() + exibirLocalizacao.getText().toString()  + "\n";
 
 
 
@@ -227,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                                 StringBuffer oneLineStringBuffer = new StringBuffer();
                                 File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
                                 if (!file.exists()) {
-                                    file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                    //file = new File(Environment.getExternalStorageDirectory(), FILENAME);
                                     csvWriter = new PrintWriter(new FileWriter(file, true));
                                     oneLineStringBuffer.append(header);
                                     csvWriter.print(oneLineStringBuffer);
@@ -380,8 +381,10 @@ public class MainActivity extends AppCompatActivity {
 
 
             try {
-                String sourceFileUri = "storage/sdcard0/Download/LogSensores.csv";
+                File sourceFileUri = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                String sourceFileUripath = sourceFileUri + "/LogSensores.csv";
 
+                Log.d("teste:", sourceFileUripath);
                 HttpURLConnection conn = null;
                 DataOutputStream dos = null;
                 String lineEnd = "\r\n";
@@ -390,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
                 int bytesRead, bytesAvailable, bufferSize;
                 byte[] buffer;
                 int maxBufferSize = 1 * 1024 * 1024;
-                File sourceFile = new File(sourceFileUri);
+                File sourceFile = new File(sourceFileUripath);
 
                 if (sourceFile.isFile()) {
 
@@ -401,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
                         // open a URL connection to the Servlet
                         FileInputStream fileInputStream = new FileInputStream(
                                 sourceFile);
-                        URL url = new URL(upLoadServerUri);
+                        URL url = new URL("http://192.168.0.4:8000/api/csv/csv_upload/"); //upLoadServerUri
 
                         // Open a HTTP connection to the URL
                         conn = (HttpURLConnection) url.openConnection();
@@ -413,16 +416,11 @@ public class MainActivity extends AppCompatActivity {
                         conn.setRequestProperty("ENCTYPE",
                                 "multipart/form-data");
                         conn.setRequestProperty("Content-Type",
-                                "multipart/form-data;boundary=" + boundary);
-                        conn.setRequestProperty("bill", sourceFileUri);
+                                "text/csv" );
+                        //conn.setRequestProperty("bill", sourceFileUripath);
+                        Log.d("boundary:", boundary);
 
                         dos = new DataOutputStream(conn.getOutputStream());
-
-                        dos.writeBytes(twoHyphens + boundary + lineEnd);
-                        dos.writeBytes("Content-Disposition: form-data; name=\"bill\";filename=\""
-                                + sourceFileUri + "\"" + lineEnd);
-
-                        dos.writeBytes(lineEnd);
 
                         // create a buffer of maximum size
                         bytesAvailable = fileInputStream.available();
@@ -444,13 +442,6 @@ public class MainActivity extends AppCompatActivity {
 
                         }
 
-                        // send multipart form data necesssary after file
-                        // data...
-                        dos.writeBytes(lineEnd);
-                        dos.writeBytes(twoHyphens + boundary + twoHyphens
-                                + lineEnd);
-
-                        // Responses from the server (code and message)
                         int serverResponseCode = conn.getResponseCode();
                         String serverResponseMessage = conn
                                 .getResponseMessage();
@@ -460,7 +451,6 @@ public class MainActivity extends AppCompatActivity {
                             save.setText("Feito!");
                             Toast.makeText(getApplicationContext(),"Enviado com sucesso.", Toast.LENGTH_LONG).show();
 
-                            // recursiveDelete(mDirectory1);
 
                         }
 
