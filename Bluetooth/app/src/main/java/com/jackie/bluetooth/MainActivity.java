@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mEditText;
     private EditText mServerAddress;
 
-    String header = "Date, Temperature, Humidity, CO, CO2, mp25, id \n";
+    String header = "id, date, temperature, humidity, co, co2, mp25\n";
     Handler h;
 
     final int RECEIVE_MESSAGE = 1;
@@ -234,29 +234,27 @@ public class MainActivity extends AppCompatActivity {
                             String sbprint = sb.substring(0, endOfLineIndex);				// extract string
                             sb.delete(0, sb.length());
                             // and clear
-                            onLocationChanged(location);
                             mEditText.setText(sbprint); 	        // update TextView
                             String FILENAME = "Download/LogSensores.csv";
-                            String entrada = exibirData.getText().toString() + "," + sbprint +"," + mostrarDados.getText().toString() + exibirLocalizacao.getText().toString()  + "\n";
+                            String entrada =  mostrarDados.getText().toString() + ", " + exibirData.getText().toString() + "," + sbprint + "\n";
 
 
 
                             PrintWriter csvWriter;
                             if( helper == 1){
-                            try {
-                                StringBuffer oneLineStringBuffer = new StringBuffer();
-                                File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-                                if (!file.exists()) {
-                                    file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                try {
+                                    StringBuffer oneLineStringBuffer = new StringBuffer();
+                                    File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                    if (!file.exists()) {
+                                        file = new File(Environment.getExternalStorageDirectory(), FILENAME);
+                                        csvWriter = new PrintWriter(new FileWriter(file, true));
+                                        csvWriter.print(header);
+                                        csvWriter.close();
+                                    }
                                     csvWriter = new PrintWriter(new FileWriter(file, true));
-                                    oneLineStringBuffer.append(header);
+                                    oneLineStringBuffer.append(entrada);
                                     csvWriter.print(oneLineStringBuffer);
                                     csvWriter.close();
-                                }
-                                csvWriter = new PrintWriter(new FileWriter(file, true));
-                                oneLineStringBuffer.append(entrada);
-                                csvWriter.print(oneLineStringBuffer);
-                                csvWriter.close();
                             } catch (Exception e) { e.printStackTrace(); }
                             }
 
