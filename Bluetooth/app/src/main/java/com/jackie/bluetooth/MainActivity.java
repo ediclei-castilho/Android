@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import com.google.android.gms.maps.LocationSource;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -52,12 +53,17 @@ import java.util.UUID;
 import java.util.Calendar;
 
 import de.nitri.gauge.Gauge;
+import com.spark.submitbutton.SubmitButton;
+import me.drakeet.materialdialog.MaterialDialog;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "LOG";
+    public static final int REQUEST_PERMISSIONS_CODE = 128;
+    private MaterialDialog mMaterialDialog;
 
-    Button btnconect, btn1, btn2, save;
+    Button btnconect, btn1, btn2;
+    SubmitButton save;
     private EditText mostrarDados;
-    private EditText mEditText;
     private EditText mServerAddress;
 
     String header = "id, date, temperature, humidity, co, co2, mp25\n";
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     final int RECEIVE_MESSAGE = 1;
     private TextView exibirData;
     private TextView exibirLocalizacao;
+    private TextView mEditText;
     private LocationManager mLocationManager;
 
     private Gauge mGaugeTemperature;
@@ -84,9 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SOLICITA_BT_ACT = 1;
     private static final int SOLICITA_BT_CON = 2;
-    private static final int PERMISSAO_REQUEST = 1;
-    private static final int PERMISSAO1_REQUEST = 1;
-    private static final int LOCATION_REQUEST = 1;
     private static int helper = 0;
     ConnectedThread connectedThread;
     BluetoothAdapter mBluetoothAdapter = null;
@@ -116,13 +120,15 @@ public class MainActivity extends AppCompatActivity {
         btn2 = (Button) findViewById(R.id.btn2);
         mostrarDados = findViewById(R.id.mostrarDados);
         mEditText = findViewById(R.id.edit_text);
-        save = (Button) findViewById(R.id.save);
+        save = (SubmitButton) findViewById(R.id.save);
         mGaugeTemperature = findViewById(R.id.gauge);
         mGaugeHumidity = findViewById(R.id.gauge2);
         mCoGraph = findViewById(R.id.gauge3);
         mGauge4 = findViewById(R.id.gauge4);
         mGauge5 = findViewById(R.id.gauge5);
         mServerAddress = findViewById(R.id.serveraddress);
+        btn1.setEnabled(false);
+        btn2.setEnabled(false);
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -135,25 +141,16 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(ativaBT, SOLICITA_BT_ACT);
         }
         //PERMISSAO PARA LER E ESCREVER
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_REQUEST);
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSAO1_REQUEST);
+        if( ContextCompat.checkSelfPermission( this, Manifest.permission.WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED ){
+
+            if( ActivityCompat.shouldShowRequestPermissionRationale( this, Manifest.permission.WRITE_EXTERNAL_STORAGE ) ){
+                callDialog( "É necessário o acesso WRITE_EXTERNAL_STORAGE para geração do LOG csv.", new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE} );
+            }
+            else{
+                ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_CODE );
             }
         }
-        //PERMISSAO LOCALIZACAO
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
-            }
-        }
+
 
         SimpleDateFormat data_formatada = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
@@ -172,7 +169,21 @@ public class MainActivity extends AppCompatActivity {
         exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        final Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if( ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ){
+
+            if( ActivityCompat.shouldShowRequestPermissionRationale( this, Manifest.permission.ACCESS_FINE_LOCATION ) ){
+                callDialog( "É preciso a permission ACCESS_FINE_LOCATION para apresentação dos eventos locais.", new String[]{Manifest.permission.ACCESS_FINE_LOCATION} );
+            }
+            else{
+                ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS_CODE );
+            }
+        }
+        else{
+            final Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            onLocationChanged(location);
+        }
+
+
 
 
 
@@ -186,6 +197,10 @@ public class MainActivity extends AppCompatActivity {
                         mSocket.close();
                         conexao = false;
                         btnconect.setText("Conectar");
+                        btnconect.setBackgroundResource(R.color.Green);
+                        btn1.setEnabled(false);
+                        btn2.setEnabled(false);
+                        save.setEnabled(false);
                         mostrarDados.setEnabled(true);
 
 
@@ -204,6 +219,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 helper = 1;
+                btn1.setEnabled(false);
+                btnconect.setEnabled(false);
+                btn2.setEnabled(true);
 
             }
         });
@@ -211,14 +229,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 helper = 0;
+                btn1.setEnabled(true);
+                btn2.setEnabled(false);
+                btnconect.setEnabled(true);
+                save.setEnabled(true);
             }
         });
-        save.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                new UploadFileAsync().execute("");
-            }
-        });
+        save.setOnClickListener(new View.OnClickListener() {
+                                    public static final String TAG = "onclick";
+
+                                    @Override
+                                    public void onClick(View v) {
+                                        new UploadFileAsync().execute("");
+                                    }
+                                });
+
 
 
         h = new Handler() {
@@ -235,10 +260,18 @@ public class MainActivity extends AppCompatActivity {
                             sb.delete(0, sb.length());
                             // and clear
                             mEditText.setText(sbprint); 	        // update TextView
+                            String[] attributes = sbprint.split(",");
+
                             String FILENAME = "Download/LogSensores.csv";
                             String entrada =  mostrarDados.getText().toString() + ", " + exibirData.getText().toString() + "," + sbprint + "\n";
 
-
+                            for (int i =0; i < 5; i++){
+                            mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));
+                            mGaugeHumidity.moveToValue(Float.parseFloat(attributes[i]));
+                            mCoGraph.moveToValue(Float.parseFloat(attributes[i]));
+                            mGauge4.moveToValue(Float.parseFloat(attributes[i]));
+                            mGauge5.moveToValue(Float.parseFloat(attributes[i]));
+                            }
 
                             PrintWriter csvWriter;
                             if( helper == 1){
@@ -306,6 +339,8 @@ public class MainActivity extends AppCompatActivity {
                         mostrarDados.setEnabled(false);
 
                         btnconect.setText("Desconectar");
+                        btn1.setEnabled(true);
+                        btnconect.setBackgroundResource(R.color.Red);
                         Toast.makeText(getApplicationContext(),"Conexão efetuada com sucesso.", Toast.LENGTH_LONG).show();
 
                     } catch (IOException erro){
@@ -365,6 +400,26 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    private void callDialog( String message, final String[] permissions ){
+        mMaterialDialog = new MaterialDialog(this)
+                .setTitle("Permission")
+                .setMessage( message )
+                .setPositiveButton("Ok", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        ActivityCompat.requestPermissions(MainActivity.this, permissions, REQUEST_PERMISSIONS_CODE);
+                        mMaterialDialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mMaterialDialog.dismiss();
+                    }
+                });
+        mMaterialDialog.show();
     }
 
     private class UploadFileAsync extends AsyncTask<String, Void, String> {
@@ -444,6 +499,16 @@ public class MainActivity extends AppCompatActivity {
 
                             save.setText("Feito!");
                             Toast.makeText(getApplicationContext(),"Enviado com sucesso.", Toast.LENGTH_LONG).show();
+                            if (sourceFileUri.exists()) {
+                                new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), "LogSensores.csv").delete();
+                                String FILENAME = "LogSensores.csv";
+                                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), FILENAME);
+                                if (!file.exists()) {
+                                    Log.i(TAG, "Folder DELETED!");
+                                } else {
+                                    Log.i(TAG, "Folder delete action was FAIL, take some permissions!");
+                                }
+                            }
 
 
                         }
@@ -485,7 +550,4 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(Void... values) {
         }
     }
-
-
-
 }

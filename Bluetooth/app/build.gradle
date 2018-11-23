@@ -27,6 +27,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.0'
     implementation 'com.jjoe64:graphview:4.2.1'
+    implementation 'me.drakeet.materialdialog:library:1.2.2'
 
+    implementation 'me.spark:submitbutton:1.0.1'
     implementation 'com.github.Pygmalion69:Gauge:1.4'
 }

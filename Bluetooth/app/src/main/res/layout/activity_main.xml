@@ -1,47 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:gauge="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    android:background="@color/Sky"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:ignore="NamespaceTypo">
 
     <Button
+        android:id="@+id/btnconect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#90b39b"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         android:text="Conectar"
-        android:id="@+id/btnconect"/>
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/btn1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Iniciar" />
-
+        android:background="@drawable/buttonstart"
+        android:shadowColor="#003DA6"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="Iniciar"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
 
 
     <Button
         android:id="@+id/btn2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Parar" />
+        android:background="@drawable/buttonstop"
+        android:shadowColor="#003DA6"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="Parar"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/mostrarDados"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Insira o ID: " />
+        android:background="@color/white"
+        android:hint="Insira o ID: "
+        android:textSize="15dp" />
 
-    <EditText
+    <TextView
         android:id="@+id/edit_text"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Dados do sensor"/>
+        android:background="@color/white"
+        android:hint="Dados do sensor" />
 
     <TextView
         android:id="@+id/vData"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:visibility="invisible" />
 
     <TextView
@@ -50,45 +78,57 @@
         android:layout_height="1dp"
         android:visibility="invisible" />
 
-    <de.nitri.gauge.Gauge
-        android:id="@+id/gauge"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_gravity="center"
-        gauge:initialValue="50"
-        gauge:lowerText="Temp (°C)"
-        gauge:maxValue="70"
-        gauge:minValue="0"
-        gauge:totalNicks="100"
-        gauge:valuePerNick="1" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
         android:orientation="horizontal"
         tools:context="com.jackie.bluetooth.MainActivity">
 
         <de.nitri.gauge.Gauge
-            android:id="@+id/gauge2"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginLeft="1dp"
-            gauge:lowerText="Umid. (%HR)"
-            gauge:initialValue="22"
-            gauge:maxValue="100"
+            android:id="@+id/gauge"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_gravity="left"
+            gauge:initialValue="50"
+            gauge:lowerText="Temp (°C)"
+            gauge:maxValue="70"
             gauge:minValue="0"
             gauge:totalNicks="100"
             gauge:valuePerNick="1" />
 
         <de.nitri.gauge.Gauge
-            android:id="@+id/gauge3"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:id="@+id/gauge2"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center"
             android:layout_marginStart="1dp"
             android:layout_marginLeft="1dp"
-            gauge:majorNickInterval="20"
+            gauge:initialValue="22"
+            gauge:lowerText="Umid. (%HR)"
+            gauge:maxValue="100"
+            gauge:minValue="0"
+            gauge:totalNicks="100"
+            gauge:valuePerNick="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        tools:context="com.jackie.bluetooth.MainActivity">
+
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/gauge3"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
             gauge:lowerText="CO (PPM)"
+            gauge:majorNickInterval="20"
             gauge:maxValue="100"
             gauge:minValue="0"
             gauge:totalNicks="100"
@@ -96,12 +136,12 @@
 
         <de.nitri.gauge.Gauge
             android:id="@+id/gauge4"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_marginStart="1dp"
             android:layout_marginLeft="1dp"
-            gauge:lowerText="CO2(PPM)"
             gauge:initialValue="22"
+            gauge:lowerText="CO2(PPM)"
             gauge:maxValue="100"
             gauge:minValue="0"
             gauge:totalNicks="100"
@@ -109,27 +149,35 @@
 
         <de.nitri.gauge.Gauge
             android:id="@+id/gauge5"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_marginStart="1dp"
             android:layout_marginLeft="1dp"
-            gauge:majorNickInterval="20"
             gauge:lowerText="MP2.5(mg/m3)"
+            gauge:majorNickInterval="20"
             gauge:maxValue="100"
             gauge:minValue="0"
             gauge:totalNicks="100"
             gauge:valuePerNick="1" />
     </LinearLayout>
+
     <EditText
         android:id="@+id/serveraddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Insira o Endereço do Servidor!"/>
-    <Button
+        android:background="@color/white"
+        android:hint="Insira o Endereço do Servidor!"
+        android:textSize="16dp" />
+
+    <com.spark.submitbutton.SubmitButton
+        android:id="@+id/save"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enviar para servidor"
-        android:id="@+id/save"/>
+        android:layout_height="match_parent"
+        android:enabled="false"
+        android:text="ENVIAR SERVIDOR"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:sub_btn_duration="4000" />
 
 
 </LinearLayout>
