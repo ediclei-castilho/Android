@@ -64,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
     private MaterialDialog mMaterialDialog;
 
     Button btn1, btn2;
-    FloatingActionButton save, btnconect;
+    FloatingActionButton save, btnconect, btntrash;
     //SubmitButton save;
     private EditText mostrarDados;
     private EditText mServerAddress;
 
-    String header = "id, temperature, humidity, co, co2, mp25\n";
+    String header = "id,temperature,humidity,co,co2,mp25\n";
     Handler h;
 
     final int RECEIVE_MESSAGE = 1;
@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnconect = (FloatingActionButton) findViewById(R.id.btnconect);
+        btntrash = (FloatingActionButton) findViewById(R.id.btntrash);
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         mostrarDados = findViewById(R.id.mostrarDados);
@@ -217,6 +218,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btntrash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File sourceFileUri = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+                if (sourceFileUri.exists()) {
+                    new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), "LogSensores.csv").delete();
+                    String FILENAME = "LogSensores.csv";
+                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), FILENAME);
+                    if (!file.exists()) {
+                        Snackbar.make(findViewById(R.id.action_main), "Folder deleted", Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        Snackbar.make(findViewById(R.id.action_main), "Folder delete action was FAIL, take some permissions!", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
                 btn2.setEnabled(false);
                 btnconect.setEnabled(true);
                 save.setEnabled(true);
+                mostrarDados.setEnabled(true);
             }
         });
         save.setOnClickListener(new View.OnClickListener() {

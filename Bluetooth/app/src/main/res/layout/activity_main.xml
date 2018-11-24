@@ -16,6 +16,16 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btntrash"
+        android:backgroundTint="#ff404e"
+        app:borderWidth="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginBottom="140dp"
+        app:srcCompat="@android:drawable/ic_menu_delete" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btnconect"
