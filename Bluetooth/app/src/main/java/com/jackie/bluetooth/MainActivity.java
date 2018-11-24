@@ -1,6 +1,7 @@
 package com.jackie.bluetooth;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.icu.util.UniversalTimeScale;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -63,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_PERMISSIONS_CODE = 128;
     private MaterialDialog mMaterialDialog;
 
-    Button btn1, btn2;
+    Button btn1, btn2, btnExibir;
     FloatingActionButton save, btnconect, btntrash;
     //SubmitButton save;
     private EditText mostrarDados;
     private EditText mServerAddress;
 
-    String header = "id,temperature,humidity,co,co2,mp25\n";
+    String header = "created_at,sensor,temperature,humidity,co,co2,mp25\n";
     Handler h;
 
     final int RECEIVE_MESSAGE = 1;
@@ -123,8 +124,10 @@ public class MainActivity extends AppCompatActivity {
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         mostrarDados = findViewById(R.id.mostrarDados);
+        exibirData = findViewById(R.id.vData);
         mEditText = findViewById(R.id.edit_text);
         save = (FloatingActionButton) findViewById(R.id.save);
+        btnExibir =  findViewById(R.id.btnExibir);
         //mGaugeTemperature = findViewById(R.id.gauge);
         //mGaugeHumidity = findViewById(R.id.gauge2);
         //mCoGraph = findViewById(R.id.gauge3);
@@ -133,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         mServerAddress = findViewById(R.id.serveraddress);
         btn1.setEnabled(false);
         btn2.setEnabled(false);
+
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        SimpleDateFormat data_formatada = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat data_formatada = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
         Date data = new Date();
 
@@ -167,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
         String dataFormatada = data_formatada.format(data_atual);
 
 
-        //exibirData = (TextView) findViewById(R.id.vData);
-        //exibirData.setText(dataFormatada);
+        exibirData = (TextView) findViewById(R.id.vData);
+        exibirData.setText(dataFormatada);
 
         //exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
         //mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -215,6 +219,15 @@ public class MainActivity extends AppCompatActivity {
                     Intent abreLista = new Intent(MainActivity.this, ListaDispositivos.class);
                     startActivityForResult(abreLista, SOLICITA_BT_CON);
                 }
+            }
+        });
+
+
+        btnExibir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent grafico = new Intent (MainActivity.this, GraficosActivity.class);
+
             }
         });
 
@@ -287,8 +300,8 @@ public class MainActivity extends AppCompatActivity {
                             String[] attributes = sbprint.split(",");
 
                             String FILENAME = "Download/LogSensores.csv";
-                            //String entrada =  mostrarDados.getText().toString() + ", " + exibirData.getText().toString() + "," + sbprint + "\n";
-                            String entrada =  mostrarDados.getText().toString() + ", " + sbprint + "\n";
+                            String entrada =  exibirData.getText().toString() + "," + mostrarDados.getText().toString() + "," + sbprint + "\n";
+                            //String entrada =  mostrarDados.getText().toString() + ", " + sbprint + "\n";
 
                             for (int i =0; i < 5; i++){
                             //mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));

@@ -35,6 +35,8 @@
                 android:layout_weight="1"
                 android:background="#34db74"
                 android:text="Start" />
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -75,6 +77,25 @@
                     android:layout_marginRight="10dp"
                     android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/btnExibir"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:background="#34db74"
+                android:text="Exibir" />
+            <EditText
+                android:id="@+id/vData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="It's show time!"
+                android:inputType="text"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:singleLine="true" />
+
 
             <TextView
                 android:id="@+id/edit_text"
