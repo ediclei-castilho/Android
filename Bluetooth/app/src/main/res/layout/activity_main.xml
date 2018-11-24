@@ -1,183 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:gauge="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/action_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/Sky"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    tools:ignore="NamespaceTypo">
+    tools:context=".MainActivity">
 
-    <Button
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_main" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/btnconect"
-        android:layout_width="match_parent"
+        android:backgroundTint="#3498db"
+        app:borderWidth="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#90b39b"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="Conectar"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/stat_sys_data_bluetooth" />
 
-    <Button
-        android:id="@+id/btn1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/buttonstart"
-        android:shadowColor="#003DA6"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="Iniciar"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp" />
-
-
-    <Button
-        android:id="@+id/btn2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/buttonstop"
-        android:shadowColor="#003DA6"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="Parar"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp" />
-
-    <EditText
-        android:id="@+id/mostrarDados"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:hint="Insira o ID: "
-        android:textSize="15dp" />
-
-    <TextView
-        android:id="@+id/edit_text"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:hint="Dados do sensor" />
-
-    <TextView
-        android:id="@+id/vData"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible" />
-
-    <TextView
-        android:id="@+id/vLocalizacao"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:visibility="invisible" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        tools:context="com.jackie.bluetooth.MainActivity">
-
-        <de.nitri.gauge.Gauge
-            android:id="@+id/gauge"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_gravity="left"
-            gauge:initialValue="50"
-            gauge:lowerText="Temp (°C)"
-            gauge:maxValue="70"
-            gauge:minValue="0"
-            gauge:totalNicks="100"
-            gauge:valuePerNick="1" />
-
-        <de.nitri.gauge.Gauge
-            android:id="@+id/gauge2"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_gravity="center"
-            android:layout_marginStart="1dp"
-            android:layout_marginLeft="1dp"
-            gauge:initialValue="22"
-            gauge:lowerText="Umid. (%HR)"
-            gauge:maxValue="100"
-            gauge:minValue="0"
-            gauge:totalNicks="100"
-            gauge:valuePerNick="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        tools:context="com.jackie.bluetooth.MainActivity">
-
-
-        <de.nitri.gauge.Gauge
-            android:id="@+id/gauge3"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginLeft="1dp"
-            gauge:lowerText="CO (PPM)"
-            gauge:majorNickInterval="20"
-            gauge:maxValue="100"
-            gauge:minValue="0"
-            gauge:totalNicks="100"
-            gauge:valuePerNick="1" />
-
-        <de.nitri.gauge.Gauge
-            android:id="@+id/gauge4"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginLeft="1dp"
-            gauge:initialValue="22"
-            gauge:lowerText="CO2(PPM)"
-            gauge:maxValue="100"
-            gauge:minValue="0"
-            gauge:totalNicks="100"
-            gauge:valuePerNick="1" />
-
-        <de.nitri.gauge.Gauge
-            android:id="@+id/gauge5"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginLeft="1dp"
-            gauge:lowerText="MP2.5(mg/m3)"
-            gauge:majorNickInterval="20"
-            gauge:maxValue="100"
-            gauge:minValue="0"
-            gauge:totalNicks="100"
-            gauge:valuePerNick="1" />
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/serveraddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:hint="Insira o Endereço do Servidor!"
-        android:textSize="16dp" />
-
-    <com.spark.submitbutton.SubmitButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/save"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:enabled="false"
-        android:text="ENVIAR SERVIDOR"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:sub_btn_duration="4000" />
+        android:backgroundTint="#34db74"
+        app:borderWidth="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginBottom="80dp"
+        app:srcCompat="@android:drawable/ic_menu_send" />
 
-
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

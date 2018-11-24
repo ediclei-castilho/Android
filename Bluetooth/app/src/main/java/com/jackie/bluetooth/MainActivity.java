@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -61,12 +63,13 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_PERMISSIONS_CODE = 128;
     private MaterialDialog mMaterialDialog;
 
-    Button btnconect, btn1, btn2;
-    SubmitButton save;
+    Button btn1, btn2;
+    FloatingActionButton save, btnconect;
+    //SubmitButton save;
     private EditText mostrarDados;
     private EditText mServerAddress;
 
-    String header = "id, date, temperature, humidity, co, co2, mp25\n";
+    String header = "id, temperature, humidity, co, co2, mp25\n";
     Handler h;
 
     final int RECEIVE_MESSAGE = 1;
@@ -115,17 +118,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnconect = (Button) findViewById(R.id.btnconect);
+        btnconect = (FloatingActionButton) findViewById(R.id.btnconect);
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         mostrarDados = findViewById(R.id.mostrarDados);
         mEditText = findViewById(R.id.edit_text);
-        save = (SubmitButton) findViewById(R.id.save);
-        mGaugeTemperature = findViewById(R.id.gauge);
-        mGaugeHumidity = findViewById(R.id.gauge2);
-        mCoGraph = findViewById(R.id.gauge3);
-        mGauge4 = findViewById(R.id.gauge4);
-        mGauge5 = findViewById(R.id.gauge5);
+        save = (FloatingActionButton) findViewById(R.id.save);
+        //mGaugeTemperature = findViewById(R.id.gauge);
+        //mGaugeHumidity = findViewById(R.id.gauge2);
+        //mCoGraph = findViewById(R.id.gauge3);
+        //mGauge4 = findViewById(R.id.gauge4);
+        //mGauge5 = findViewById(R.id.gauge5);
         mServerAddress = findViewById(R.id.serveraddress);
         btn1.setEnabled(false);
         btn2.setEnabled(false);
@@ -163,11 +166,11 @@ public class MainActivity extends AppCompatActivity {
         String dataFormatada = data_formatada.format(data_atual);
 
 
-        exibirData = (TextView) findViewById(R.id.vData);
-        exibirData.setText(dataFormatada);
+        //exibirData = (TextView) findViewById(R.id.vData);
+        //exibirData.setText(dataFormatada);
 
-        exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
+        //mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if( ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ){
 
@@ -179,12 +182,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         else{
-            final Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            onLocationChanged(location);
+            //final Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            //onLocationChanged(location);
         }
-
-
-
 
 
         btnconect.setOnClickListener(new View.OnClickListener() {
@@ -196,17 +196,18 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         mSocket.close();
                         conexao = false;
-                        btnconect.setText("Conectar");
-                        btnconect.setBackgroundResource(R.color.Green);
+                        //btnconect.setText("Conectar");
+                        //tnconect.setBackgroundResource(R.color.Green);
                         btn1.setEnabled(false);
                         btn2.setEnabled(false);
                         save.setEnabled(false);
                         mostrarDados.setEnabled(true);
-
-
-                        Toast.makeText(getApplicationContext(), "Sensor desconectado.", Toast.LENGTH_LONG).show();
+                        mEditText.setText("");
+                        Snackbar.make(findViewById(R.id.action_main), "Disconnected sensor", Snackbar.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "Sensor desconectado.", Toast.LENGTH_LONG).show();
                     } catch (IOException erro) {
-                        Toast.makeText(getApplicationContext(), "Erro: " + erro, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Erro: " + erro, Toast.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.action_main), "Error"+ erro, Snackbar.LENGTH_SHORT).show();
                     }
                 } else {
                     //conectar
@@ -215,11 +216,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 helper = 1;
                 btn1.setEnabled(false);
+                mostrarDados.setEnabled(false);
                 btnconect.setEnabled(false);
                 btn2.setEnabled(true);
 
@@ -230,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 helper = 0;
                 btn1.setEnabled(true);
+                mServerAddress.setEnabled(true);
                 btn2.setEnabled(false);
                 btnconect.setEnabled(true);
                 save.setEnabled(true);
@@ -263,14 +267,15 @@ public class MainActivity extends AppCompatActivity {
                             String[] attributes = sbprint.split(",");
 
                             String FILENAME = "Download/LogSensores.csv";
-                            String entrada =  mostrarDados.getText().toString() + ", " + exibirData.getText().toString() + "," + sbprint + "\n";
+                            //String entrada =  mostrarDados.getText().toString() + ", " + exibirData.getText().toString() + "," + sbprint + "\n";
+                            String entrada =  mostrarDados.getText().toString() + ", " + sbprint + "\n";
 
                             for (int i =0; i < 5; i++){
-                            mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));
-                            mGaugeHumidity.moveToValue(Float.parseFloat(attributes[i]));
-                            mCoGraph.moveToValue(Float.parseFloat(attributes[i]));
-                            mGauge4.moveToValue(Float.parseFloat(attributes[i]));
-                            mGauge5.moveToValue(Float.parseFloat(attributes[i]));
+                            //mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));
+                            //mGaugeHumidity.moveToValue(Float.parseFloat(attributes[i]));
+                            //mCoGraph.moveToValue(Float.parseFloat(attributes[i]));
+                            //mGauge4.moveToValue(Float.parseFloat(attributes[i]));
+                            //mGauge5.moveToValue(Float.parseFloat(attributes[i]));
                             }
 
                             PrintWriter csvWriter;
@@ -314,7 +319,9 @@ public class MainActivity extends AppCompatActivity {
 
             case SOLICITA_BT_ACT:
                 if(resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(getApplicationContext(),"Bluetooth ativado com sucesso.", Toast.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.action_main), "Bluetooth enabled successfully", Snackbar.LENGTH_SHORT).show();
+
+                    //Toast.makeText(getApplicationContext(),"Bluetooth ativado com sucesso.", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(),"Ativação do Bluetooth necessária para a execução da aplicação!", Toast.LENGTH_LONG).show();
                     finish();
@@ -336,21 +343,25 @@ public class MainActivity extends AppCompatActivity {
 
                         connectedThread = new ConnectedThread(mSocket);
                         connectedThread.start();
-                        mostrarDados.setEnabled(false);
+                        //mostrarDados.setEnabled(false);
 
-                        btnconect.setText("Desconectar");
+                        //btnconect.setText("Desconectar");
                         btn1.setEnabled(true);
                         btnconect.setBackgroundResource(R.color.Red);
-                        Toast.makeText(getApplicationContext(),"Conexão efetuada com sucesso.", Toast.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.action_main), "Connection successful", Snackbar.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),"Conexão efetuada com sucesso.", Toast.LENGTH_LONG).show();
 
                     } catch (IOException erro){
 
                         conexao = false;
-                        Toast.makeText(getApplicationContext(),"Falha durante a conexão, erro: " + erro, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),"Falha durante a conexão, erro: " + erro, Toast.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.action_main), "Failed to connect, error:"+ erro, Snackbar.LENGTH_SHORT).show();
                         mostrarDados.setEnabled(true);
                     }
                 }else{
-                    Toast.makeText(getApplicationContext(),"Erro ao obter o Endereço MAC.", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(),"Erro ao obter o Endereço MAC.", Toast.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.action_main), "Error getting MAC address", Snackbar.LENGTH_SHORT).show();
+
                 }
 
 
@@ -426,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            save.setText("AGUARDE...");
+            //save.setText("AGUARDE...");
 
 
             try {
@@ -445,11 +456,9 @@ public class MainActivity extends AppCompatActivity {
                 File sourceFile = new File(sourceFileUripath);
 
                 if (sourceFile.isFile()) {
-
                     try {
                         mServerAddress.setEnabled(false);
                         String upLoadServerUri = mServerAddress.getText().toString();
-
                         // open a URL connection to the Servlet
                         FileInputStream fileInputStream = new FileInputStream(
                                 sourceFile);
@@ -479,7 +488,6 @@ public class MainActivity extends AppCompatActivity {
 
                         // read file and write it into form...
                         bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
                         while (bytesRead > 0) {
 
                             dos.write(buffer, 0, bufferSize);
@@ -490,15 +498,13 @@ public class MainActivity extends AppCompatActivity {
                                     bufferSize);
 
                         }
-
                         int serverResponseCode = conn.getResponseCode();
-                        String serverResponseMessage = conn
-                                .getResponseMessage();
+                        String serverResponseMessage = conn.getResponseMessage();
 
                         if (serverResponseCode == 200) {
-
-                            save.setText("Feito!");
-                            Toast.makeText(getApplicationContext(),"Enviado com sucesso.", Toast.LENGTH_LONG).show();
+                            View view = findViewById(R.id.action_main);
+                            Snackbar.make(view, "Sent with success", Snackbar.LENGTH_SHORT).show();
+                            //Toast.makeText(getApplicationContext(),"Enviado com sucesso.", Toast.LENGTH_LONG).show();
                             if (sourceFileUri.exists()) {
                                 new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), "LogSensores.csv").delete();
                                 String FILENAME = "LogSensores.csv";
@@ -511,6 +517,9 @@ public class MainActivity extends AppCompatActivity {
                             }
 
 
+                        }
+                        else{
+                            Snackbar.make(findViewById(R.id.action_main), "Error to send", Snackbar.LENGTH_SHORT).show();
                         }
 
                         // close the streams //
@@ -527,8 +536,13 @@ public class MainActivity extends AppCompatActivity {
                     // dialog.dismiss();
 
                 } // End else block
+                else{
+                    View view = findViewById(R.id.action_main);
+                    Snackbar.make(view, "Empty file", Snackbar.LENGTH_SHORT).show();
 
+                }
 
+                mServerAddress.setEnabled(true);
             } catch (Exception ex) {
                 // dialog.dismiss();
 
