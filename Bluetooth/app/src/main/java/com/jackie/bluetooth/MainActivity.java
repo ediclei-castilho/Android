@@ -124,10 +124,8 @@ public class MainActivity extends AppCompatActivity {
         btn1 = (Button) findViewById(R.id.btn1);
         btn2 = (Button) findViewById(R.id.btn2);
         mostrarDados = findViewById(R.id.mostrarDados);
-        exibirData = findViewById(R.id.vData);
         mEditText = findViewById(R.id.edit_text);
         save = (FloatingActionButton) findViewById(R.id.save);
-        btnExibir =  findViewById(R.id.btnExibir);
         //mGaugeTemperature = findViewById(R.id.gauge);
         //mGaugeHumidity = findViewById(R.id.gauge2);
         //mCoGraph = findViewById(R.id.gauge3);
@@ -159,20 +157,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-        SimpleDateFormat data_formatada = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
-        Date data = new Date();
-
-        Calendar calendario = Calendar.getInstance();
-        calendario.setTime(data);
-
-        Date data_atual = calendario.getTime();
-        String dataFormatada = data_formatada.format(data_atual);
-
-
-        exibirData = (TextView) findViewById(R.id.vData);
-        exibirData.setText(dataFormatada);
 
         //exibirLocalizacao = (TextView) findViewById(R.id.vLocalizacao);
         //mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -223,13 +207,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        btnExibir.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent grafico = new Intent (MainActivity.this, GraficosActivity.class);
-
-            }
-        });
 
         btntrash.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,8 +276,20 @@ public class MainActivity extends AppCompatActivity {
                             mEditText.setText(sbprint); 	        // update TextView
                             String[] attributes = sbprint.split(",");
 
+
+                            SimpleDateFormat data_formatada = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+                            Date data = new Date();
+
+                            Calendar calendario = Calendar.getInstance();
+                            calendario.setTime(data);
+
+                            Date data_atual = calendario.getTime();
+                            String dataFormatada = data_formatada.format(data_atual);
+
+
                             String FILENAME = "Download/LogSensores.csv";
-                            String entrada =  exibirData.getText().toString() + "," + mostrarDados.getText().toString() + "," + sbprint + "\n";
+                            String entrada =  dataFormatada + "," + mostrarDados.getText().toString() + "," + sbprint + "\n";
                             //String entrada =  mostrarDados.getText().toString() + ", " + sbprint + "\n";
 
                             for (int i =0; i < 5; i++){
