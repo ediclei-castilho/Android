@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:gauge="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,7 +12,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="507dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -41,7 +43,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="323dp"
+            android:layout_height="195dp"
             android:layout_marginTop="@dimen/fab_margin"
             android:orientation="vertical">
 
@@ -55,10 +57,10 @@
                     android:id="@+id/mostrarDados"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Insert ID"
-                    android:inputType="text"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
+                    android:hint="Insert ID"
+                    android:inputType="text"
                     android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
 
@@ -71,10 +73,10 @@
                     android:id="@+id/serveraddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Insert Address"
-                    android:inputType="text"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
+                    android:hint="Insert Address"
+                    android:inputType="text"
                     android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
 
@@ -83,13 +85,93 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Valores Recebido"
-                android:gravity="center"
-                android:layout_marginTop="40dp"
                 android:layout_marginLeft="10dp"
+                android:layout_marginTop="40dp"
                 android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:text="Valores Recebidos"
                 android:textSize="20dp" /><!--Display Text as AbhiAndroid-->
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <de.nitri.gauge.Gauge
+                android:id="@+id/gauge"
+                gauge:initialValue="50"
+                gauge:lowerText="Temp (°C)"
+                gauge:maxValue="70"
+                gauge:minValue="0"
+                gauge:totalNicks="100"
+                gauge:valuePerNick="1"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_gravity="left" />
+
+            <de.nitri.gauge.Gauge
+                android:id="@+id/gauge2"
+                gauge:initialValue="22"
+                gauge:lowerText="Umid. (%HR)"
+                gauge:maxValue="100"
+                gauge:minValue="0"
+                gauge:totalNicks="100"
+                gauge:valuePerNick="1"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="1dp"
+                android:layout_marginLeft="1dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+
+
+            <de.nitri.gauge.Gauge
+                android:id="@+id/gauge3"
+                gauge:lowerText="CO (PPM)"
+                gauge:majorNickInterval="20"
+                gauge:maxValue="100"
+                gauge:minValue="0"
+                gauge:totalNicks="100"
+                gauge:valuePerNick="1"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginLeft="1dp" />
+
+            <de.nitri.gauge.Gauge
+                android:id="@+id/gauge4"
+                gauge:initialValue="22"
+                gauge:lowerText="CO2(PPM)"
+                gauge:maxValue="5000"
+                gauge:minValue="0"
+                gauge:totalNicks="100"
+                gauge:valuePerNick="1"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginLeft="1dp" />
+
+            <de.nitri.gauge.Gauge
+                android:id="@+id/gauge5"
+                gauge:lowerText="MP2.5(mg/m3)"
+                gauge:majorNickInterval="20"
+                gauge:maxValue="100"
+                gauge:minValue="0"
+                gauge:totalNicks="100"
+                gauge:valuePerNick="1"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginLeft="1dp" />
+        </LinearLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

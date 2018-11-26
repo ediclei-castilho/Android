@@ -51,6 +51,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import java.util.Calendar;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        exibirData = findViewById(R.id.time);
         btnconect = (FloatingActionButton) findViewById(R.id.btnconect);
         btntrash = (FloatingActionButton) findViewById(R.id.btntrash);
         btn1 = (Button) findViewById(R.id.btn1);
@@ -126,11 +128,11 @@ public class MainActivity extends AppCompatActivity {
         mostrarDados = findViewById(R.id.mostrarDados);
         mEditText = findViewById(R.id.edit_text);
         save = (FloatingActionButton) findViewById(R.id.save);
-        //mGaugeTemperature = findViewById(R.id.gauge);
-        //mGaugeHumidity = findViewById(R.id.gauge2);
-        //mCoGraph = findViewById(R.id.gauge3);
-        //mGauge4 = findViewById(R.id.gauge4);
-        //mGauge5 = findViewById(R.id.gauge5);
+        mGaugeTemperature = findViewById(R.id.gauge);
+        mGaugeHumidity = findViewById(R.id.gauge2);
+        mCoGraph = findViewById(R.id.gauge3);
+        mGauge4 = findViewById(R.id.gauge4);
+        mGauge5 = findViewById(R.id.gauge5);
         mServerAddress = findViewById(R.id.serveraddress);
         btn1.setEnabled(false);
         btn2.setEnabled(false);
@@ -174,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
             //final Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             //onLocationChanged(location);
         }
+
+
 
 
         btnconect.setOnClickListener(new View.OnClickListener() {
@@ -278,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                             SimpleDateFormat data_formatada = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
+                            data_formatada.setTimeZone(TimeZone.getTimeZone("UTC"));
                             Date data = new Date();
 
                             Calendar calendario = Calendar.getInstance();
@@ -293,11 +297,11 @@ public class MainActivity extends AppCompatActivity {
                             //String entrada =  mostrarDados.getText().toString() + ", " + sbprint + "\n";
 
                             for (int i =0; i < 5; i++){
-                            //mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));
-                            //mGaugeHumidity.moveToValue(Float.parseFloat(attributes[i]));
-                            //mCoGraph.moveToValue(Float.parseFloat(attributes[i]));
-                            //mGauge4.moveToValue(Float.parseFloat(attributes[i]));
-                            //mGauge5.moveToValue(Float.parseFloat(attributes[i]));
+                            mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));
+                            mGaugeHumidity.moveToValue(Float.parseFloat(attributes[i]));
+                            mCoGraph.moveToValue(Float.parseFloat(attributes[i]));
+                            mGauge4.moveToValue(Float.parseFloat(attributes[i]));
+                            mGauge5.moveToValue(Float.parseFloat(attributes[i]));
                             }
 
                             PrintWriter csvWriter;
