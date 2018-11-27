@@ -1,7 +1,5 @@
 package com.jackie.bluetooth;
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.icu.util.UniversalTimeScale;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,7 +11,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import android.Manifest;
@@ -30,21 +30,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-import com.google.android.gms.maps.LocationSource;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -57,7 +52,6 @@ import java.util.UUID;
 import java.util.Calendar;
 
 import de.nitri.gauge.Gauge;
-import com.spark.submitbutton.SubmitButton;
 import me.drakeet.materialdialog.MaterialDialog;
 
 public class MainActivity extends AppCompatActivity {
@@ -85,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private Gauge mCoGraph;
     private Gauge mGauge4;
     private Gauge mGauge5;
+    private GraphView graph;
 
 
 
@@ -136,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
         mServerAddress = findViewById(R.id.serveraddress);
         btn1.setEnabled(false);
         btn2.setEnabled(false);
-
+        graph = findViewById(R.id.graph);
+        //final LineGraphSeries<DataPoint>[] series = new LineGraphSeries<DataPoint>[1];
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -189,8 +185,6 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         mSocket.close();
                         conexao = false;
-                        //btnconect.setText("Conectar");
-                        //tnconect.setBackgroundResource(R.color.Green);
                         btn1.setEnabled(false);
                         btn2.setEnabled(false);
                         save.setEnabled(false);
@@ -254,15 +248,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         save.setOnClickListener(new View.OnClickListener() {
-                                    public static final String TAG = "onclick";
+            public static final String TAG = "onclick";
 
-                                    @Override
-                                    public void onClick(View v) {
-                                        new UploadFileAsync().execute("");
-                                    }
-                                });
-
-
+            @Override
+            public void onClick(View v) {
+                new UploadFileAsync().execute("");
+            }
+        });
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -296,13 +288,19 @@ public class MainActivity extends AppCompatActivity {
                             String entrada =  dataFormatada + "," + mostrarDados.getText().toString() + "," + sbprint + "\n";
                             //String entrada =  mostrarDados.getText().toString() + ", " + sbprint + "\n";
 
-                            for (int i =0; i < 5; i++){
-                            mGaugeTemperature.moveToValue(Float.parseFloat(attributes[i]));
-                            mGaugeHumidity.moveToValue(Float.parseFloat(attributes[i]));
-                            mCoGraph.moveToValue(Float.parseFloat(attributes[i]));
-                            mGauge4.moveToValue(Float.parseFloat(attributes[i]));
-                            mGauge5.moveToValue(Float.parseFloat(attributes[i]));
-                            }
+                            mGaugeTemperature.moveToValue(Float.parseFloat(attributes[0]));
+                            mGaugeHumidity.moveToValue(Float.parseFloat(attributes[1]));
+                            mCoGraph.moveToValue(Float.parseFloat(attributes[2]));
+                            mGauge4.moveToValue(Float.parseFloat(attributes[3]));
+                            mGauge5.moveToValue(Float.parseFloat(attributes[4]));
+                            LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
+                                    new DataPoint(Float.parseFloat(attributes[0]), 1),
+                                    new DataPoint(Float.parseFloat(attributes[1]), 2),
+                                    new DataPoint(Float.parseFloat(attributes[2]), 3),
+                                    new DataPoint(Float.parseFloat(attributes[3]), 4),
+                                    new DataPoint(Float.parseFloat(attributes[4]), 5)
+                            });
+                            graph.addSeries(series);
 
                             PrintWriter csvWriter;
                             if( helper == 1){
@@ -416,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void run() {
-            byte[] buffer = new byte[1024];  // buffer store for the stream
+            byte[] buffer;  // buffer store for the stream
             int bytes; // bytes returned from read()
             // Keep listening to the InputStream until an exception occurs
             while (true) {
@@ -590,4 +588,5 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(Void... values) {
         }
     }
+
 }
